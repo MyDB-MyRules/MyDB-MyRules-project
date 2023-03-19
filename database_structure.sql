@@ -17,14 +17,14 @@ create table customer (
 );
 
 create table userdata (
-    id varchar not null,
+    customer_id varchar not null,
     name varchar not null,
     username varchar not null,
     email varchar not null,
     password varchar not null,
-    primary key (id),
+    primary key (username),
     constraint fk_userdata_customer_id
-    foreign key (id)
+    foreign key (customer_id)
     references customer (id)
 );
 
