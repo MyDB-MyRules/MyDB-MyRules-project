@@ -60,8 +60,8 @@ def compare_2_stocks(request, stock_id1, stock_id2):
 
 def buy_stock_view(request):
     # Ensure that the request is a POST request
-    # if request.method != 'POST':
-    #     return HttpResponseBadRequest("Invalid request method")
+    if request.method != 'POST':
+        print("invalid")
 
     form = BuyForm(request.POST)
     
@@ -71,7 +71,7 @@ def buy_stock_view(request):
     quantity = form.cleaned_data['quantity']
 
     # Retrieve the Stock object from the database
-    stock = StockMetadata.objects.get(id=stock_id)
+    stock = StockMetadata.objects.get(symbol=stock_id)
 
     # Call the buy_stock() function to perform the transaction
     # try:
@@ -81,7 +81,7 @@ def buy_stock_view(request):
     transaction = buy_stock(user_id, stock_id, quantity)
     
     # Return a response to the user indicating that the transaction was successful
-    return render(request, 'buy_success.html', {'transaction': transaction})
+    return render(request, 'buy.html', {'transaction': transaction})
 
 # def sell_stock_view(request):
 #     # Ensure that the request is a POST request

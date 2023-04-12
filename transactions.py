@@ -16,6 +16,7 @@ def buy_stock(user_id, stock_id, quantity):
 
     # Create a new transaction object
     transaction = Transaction(
+        id=1,
         user=user,
         stock=stock,
         quantity=quantity,
