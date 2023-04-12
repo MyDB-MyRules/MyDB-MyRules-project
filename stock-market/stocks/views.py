@@ -1,9 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.db import connection
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth import authenticate, login, logout
 
 from .models import StockMetadata
-
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -45,3 +47,108 @@ def compare_2_stocks(request, stock_id1, stock_id2):
         stock = dictfetchall(cursor)
     
     return render (request, 'stock_comp.html', {'stock': stock, 'stock_id1': stock_id1, 'stock_id2': stock_id2})
+
+def register_user(username, password, customer_id, name, email):
+    query = '''
+    insert into 
+        customer(id, name, balance)
+    VALUES (%s, %s, %s);
+    '''
+
+    init_balance = 50000 
+    with connection.cursor() as cursor:
+        cursor.execute(query, [customer_id, name, init_balance])
+
+# # check if relation has been updated
+#     with connection.cursor() as cursor:
+#         cursor.execute('select * from customer;')
+#         print(dictfetchall(cursor))
+
+    query = '''
+    insert into 
+        userdata(username, password, customer_id, name, email)
+    VALUES (%s, %s, %s, %s, %s);
+    '''
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [username, password, customer_id, name, email])
+
+# # check if relation has been updated
+#     with connection.cursor() as cursor:
+#         cursor.execute('select * from userdata;')
+#         print(dictfetchall(cursor))    
+
+def deregister_user(username):
+    query = '''
+    delete from userdata
+    where userdata.username = %s;
+    '''
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [username])
+
+# check if relation has been updated
+    with connection.cursor() as cursor:
+        cursor.execute('select * from userdata;')
+        print(dictfetchall(cursor))    
+
+def auth_user(username, password):
+    query = '''
+    select customer_id 
+    from userdata a
+    where a.username = %s 
+        and a.password = %s;
+    '''
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [username, password])
+        output = dictfetchall(cursor)
+
+    return len(output) > 0 
+    
+def registerPage(request):
+    form = UserCreationForm()
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+
+            register_user(username=username, password=password, customer_id=username + '001', name=username, email=username + '@gmail.com')
+            form.save()
+
+            return redirect('login')
+
+    context = {'form' : form}
+    return render(request, 'register.html', context)
+
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+        verified = auth_user(username, password)
+
+        if verified and user is not None:
+            login(request, user)
+            return redirect('dashboard')
+        # else:
+        #     messages.info(request, 'Incorrect credentials')
+
+    context = {}
+    return render(request, 'login.html', context)
+
+def logoutPage(request):
+    logout(request)
+    return redirect('login')
+
+def deregisterPage(request):
+    username = str(request.user)
+    print(username)
+    deregister_user(username)
+    return redirect('register')
+
+def dashboard(request):
+    return render(request, 'dashboard.html', {})

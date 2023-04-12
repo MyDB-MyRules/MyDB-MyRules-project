@@ -7,7 +7,6 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-
 class Customer(models.Model):
     id = models.CharField(primary_key=True)
     name = models.CharField()
