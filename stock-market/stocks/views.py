@@ -39,6 +39,38 @@ select index,close2 - close1 as return from b;
     
     return render (request, 'stock_return.html', {'stock': stock, 'stock_id': stock_id})
 
+
+def stock_pnl(request, stock_id, doi):
+    query = """
+    with old as 
+    (
+        select close 
+        from stock_history
+        where symbol = %s
+            and date = %s
+    ), 
+    latest as 
+    (
+        select close, date 
+        from stock_history
+        where symbol = %s
+        order by date desc
+        limit 1
+    ) 
+    select ((latest.close - old.close) / old.close) * 100 as pnl 
+    from old, latest;
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [stock_id, doi, stock_id])
+        stock = dictfetchall(cursor)
+    
+    print(stock)
+    # return render (request, 'stock_return.html', {'stock': stock, 'stock_id': stock_id})
+    return HttpResponse(stock[0]['pnl'])
+
+
+
 def compare_2_stocks(request, stock_id1, stock_id2):
     query = '''with a as (select * from stock_history where symbol = %s), b as (select * from stock_history where symbol = %s) select a.date, a.close as close1, b.close as close2 from a, b where a.date = b.date; '''
 

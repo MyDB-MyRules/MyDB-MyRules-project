@@ -7,6 +7,7 @@ urlpatterns = [
     path('stocks/<str:stock_id1>,<str:stock_id2>', views.compare_2_stocks, name='compare_2_stocks'),
     path('stocks/<str:stock_id>', views.one_stock,name='one_stock'),
     path('stocks/ret/<str:stock_id>', views.stock_ret, name='stock_ret'),
+    path('stocks/pnl/<str:stock_id>,<str:doi>', views.stock_pnl, name='stock_pnl'),
     path('accounts/register', views.registerPage, name='register'),
     path('accounts/login', views.loginPage, name='login'),
     path('accounts/logout', views.logoutPage, name='logout'),
