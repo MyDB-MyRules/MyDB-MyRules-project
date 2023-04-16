@@ -2,8 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db import connection
 
-from .models import StockMetadata
-from .transactions import buy_stock 
+from .transactions import trade_stock , transact , buy_orders , sell_orders
 from .forms import BuyForm
 
 def stocksview(request):
@@ -58,50 +57,32 @@ def compare_2_stocks(request, stock_id1, stock_id2):
 
 
 
-def buy_stock_view(request):
+def trade_stock_view(request):
     # Ensure that the request is a POST request
-    if request.method != 'POST':
-        print("invalid")
-
-    form = BuyForm(request.POST)
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = BuyForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            user_id = form.cleaned_data['user_id']
+            stock_id = form.cleaned_data['stock_id']
+            quantity = form.cleaned_data['quantity']
+            buy_or_sell = form.cleaned_data['buy_or_sell']
+            price = form.cleaned_data['price']
+            order = form.cleaned_data['order']
+            query = '''SELECT max(id) FROM Transaction;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                op = dictfetchall(cursor)
+            print(op)
+            num_id = int(op[0]['max']) + 1
+            trade_stock(user_id, stock_id, quantity ,num_id , buy_or_sell,price ,order)
+            # Return a response to the user indicating that the transaction was successful
+            # return render(request, 'buy_succesful.html')
+    else:
+        form = BuyForm()
     
-    # Retrieve the user ID, stock ID, and quantity from the request
-    user_id = form.cleaned_data['user_id']
-    stock_id = form.cleaned_data['stock_id']
-    quantity = form.cleaned_data['quantity']
+    return render(request , "buy.html" , {"form" : form})
 
-    # Retrieve the Stock object from the database
-    stock = StockMetadata.objects.get(symbol=stock_id)
-
-    # Call the buy_stock() function to perform the transaction
-    # try:
-    #     transaction = buy_stock(user_id, stock_id, quantity)
-    # except ValueError as e:
-    #     return HttpResponseBadRequest(str(e))
-    transaction = buy_stock(user_id, stock_id, quantity)
-    
-    # Return a response to the user indicating that the transaction was successful
-    return render(request, 'buy.html', {'transaction': transaction})
-
-# def sell_stock_view(request):
-#     # Ensure that the request is a POST request
-#     if request.method != 'POST':
-#         return HttpResponseBadRequest("Invalid request method")
-
-#     # Retrieve the user ID, stock ID, and quantity from the request
-#     user_id = request.POST.get('user_id')
-#     stock_id = request.POST.get('stock_id')
-#     quantity = int(request.POST.get('quantity'))
-
-#     # Retrieve the Stock object from the database
-#     stock = Stock.objects.get(id=stock_id)
-
-#     # Call the sell_stock() function to perform the transaction
-#     try:
-#         transaction = sell_stock(user_id, stock_id, quantity)
-#     except ValueError as e:
-#         return HttpResponseBadRequest(str(e))
-
-#     # Return a response to the user indicating that the transaction was successful
-#     return render(request, 'sell_success.html', {'transaction': transaction})
 
