@@ -71,13 +71,13 @@ def trade_stock_view(request):
             buy_or_sell = form.cleaned_data['buy_or_sell']
             price = form.cleaned_data['price']
             order = form.cleaned_data['order']
-            query = '''SELECT max(id) FROM Transaction;'''
-            with connection.cursor() as cursor:
-                cursor.execute(query)
-                op = dictfetchall(cursor)
-            print(op)
-            num_id = int(op[0]['max']) + 1
-            trade_stock(user_id, stock_id, quantity ,num_id , buy_or_sell,price ,order)
+            # query = '''SELECT max(id) FROM Transaction;'''
+            # with connection.cursor() as cursor:
+            #     cursor.execute(query)
+            #     op = dictfetchall(cursor)
+            # # print(op)
+            # num_id = int(op[0]['max']) + 1
+            trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order)
             # Return a response to the user indicating that the transaction was successful
             # return render(request, 'buy_succesful.html')
     else:

@@ -14,11 +14,29 @@ sell_orders = []
 #adding and subracting in portdolio
 
 @transaction.atomic()
-def trade_stock(user_id, stock_id, quantity , num_id , buy_or_sell,price ,order):
+def trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order):
     # Get the user and stock objects
-    user = Customer.objects.get(id=user_id)
-    stock = StockMetadata.objects.get(symbol=stock_id)
-    user_port = Portfolio.objects.get(customer=user_id,stock=stock_id)
+    query = '''SELECT * from Customer where id=user_id;'''
+    query1 = '''SELECT * from StockMetadata where symbol=stock_id;'''
+    query2 = '''SELECT * from Portfolio where customer=user_id and stock=stock_id;'''
+    
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        user = dictfetchall(cursor)
+        
+    with connection.cursor() as cursor:
+        cursor.execute(query1)
+        stock = dictfetchall(cursor)
+        
+    with connection.cursor() as cursor:
+        cursor.execute(query2)
+        user_port = dictfetchall(cursor)
+        
+    
+    
+    # user = Customer.objects.get(id=user_id)
+    # stock = StockMetadata.objects.get(symbol=stock_id)
+    # user_port = Portfolio.objects.get(customer=user_id,stock=stock_id)
     
     today = date.today()
     
@@ -37,12 +55,12 @@ def trade_stock(user_id, stock_id, quantity , num_id , buy_or_sell,price ,order)
 
     # Create a new transaction object
     transaction = Transaction(
-        id=num_id,
+        id=1,
         customer=user_id,
         stock=stock_id,
         date = today,
         num_shares=quantity,
-        price_per_share =stock.price_per_share,
+        price_per_share =price,
         buy_or_sell=buy_or_sell
     )
 
@@ -67,25 +85,131 @@ def transact():
             buyt2 = buyt
             buyt2.num_shares = sellt.num_shares
             buyt2.price_per_share = sellt.price_per_share
-            buyt2.save()
+            query = '''SELECT max(id) FROM Transaction;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                op = dictfetchall(cursor)
+            # print(op)
+            buy_id = int(op[0]['max']) + 1
+            sell_id = int(op[0]['max']) + 2
+            query = '''SELECT * from Customer where id=user_id;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                user = dictfetchall(cursor)
+            new_value1 = user.balance - buyt2.price_per_share*buyt.num_shares
+            new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
+            new_value3 = user.invested_amount + buyt2.price_per_share*buyt.num_shares
+            query2 = '''Update Customer SET balance = %s , current_value = %s , invested_amount = %s , (new_value1,new_value2,new_value3);'''
+            with connection.cursor() as cursor:
+                cursor.execute(query2)
+                connection.commit()
+            sql = "INSERT INTO Transaction (id , customer , stock , date , num_shares , price_per_share , buy_or_sell) VALUES (%s, %s, %s , %s, %s, %s , %s);"
+            sql2 = "INSERT INTO Transaction (id , customer , stock , date , num_shares , price_per_share , buy_or_sell) VALUES (%s, %s, %s , %s, %s, %s , %s);"
+            with connection.cursor() as cursor:
+                cursor.execute(sql,val)
+                connection.commit()
+            with connection.cursor() as cursor:
+                cursor.execute(sql2,val1)
+                connection.commit()
+
+            # buyt2.save()
+            # sellt2.save()
             buyt.num_shares -= sellt.num_shares
             heapq.heapreplace(buy_orders, (-buyt.price_per_share, transaction))  
-            user_port = Portfolio.objects.get(customer=buyt.user_id,stock=buyt.stock_id)
-            #portfolio updation 
+            # user_port = Portfolio.objects.get(customer=buyt.user_id,stock=buyt.stock_id)
+            # portfolio updation 
+            query = '''SELECT * from Portfolio where customer=buyt.user_id and stock=buyt.stock_id;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                user_port = dictfetchall(cursor)
+            query1 = '''UPDATE Portfolio SET num_shares = %s, investes_amount = %s , current_value = %s WHERE customer = %s and stock = %s", (new_value1, new_value2,new_value3 , buyt.user_id , buyt.stock_id);'''
+            with connection.cursor() as cursor:
+                cursor.execute(query1)
+                connection.commit()
             
         elif buyt.num_shares<sellt.num_shares:
             sellt2 = sellt
             sellt2.num_shares = buyt.num_shares
             sellt2.price_per_share = buyt.price_per_share
-            sellt2.save()
+            query = '''SELECT max(id) FROM Transaction;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                op = dictfetchall(cursor)
+            # print(op)
+            buy_id = int(op[0]['max']) + 1
+            sell_id = int(op[0]['max']) + 2
+            query = '''SELECT * from Customer where id=user_id;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                user = dictfetchall(cursor)
+            new_value1 = user.balance - buyt2.price_per_share*buyt.num_shares
+            new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
+            new_value3 = user.invested_amount + buyt2.price_per_share*buyt.num_shares
+            query2 = '''Update Customer SET balance = %s , current_value = %s , invested_amount = %s , (new_value1,new_value2,new_value3)'''
+            with connection.cursor() as cursor:
+                cursor.execute(query2)
+            # sellt2.save()
+            # buyt2.save()
+            sql = "INSERT INTO Transaction (id , customer , stock , date , num_shares , price_per_share , buy_or_sell) VALUES (%s, %s, %s , %s, %s, %s , %s)"
+            sql2 = "INSERT INTO Transaction (id , customer , stock , date , num_shares , price_per_share , buy_or_sell) VALUES (%s, %s, %s , %s, %s, %s , %s)"
+            with connection.cursor() as cursor:
+                cursor.execute(sql,val)
+                connection.commit()
+            with connection.cursor() as cursor:
+                cursor.execute(sql2,val1)
+                connection.commit()
+            
             sellt.num_shares -= buyt.num_shares
             heapq.heapreplace(sell_orders, (sellt.price_per_share, transaction))  
-            user_port = Portfolio.objects.get(customer=sellt.user_id,stock=sellt.stock_id)
+            # user_port = Portfolio.objects.get(customer=sellt.user_id,stock=sellt.stock_id)
+            query='''SELECT * from Portfolio where customer=sellt.user_id and stock=sellt.stock_id'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                user_port = dictfetchall(cursor)
+            query1 = '''UPDATE Portfolio SET num_shares = %s, investes_amount = %s , current_value = %s WHERE customer = %s and stock = %s", (new_value1, new_value2, new_value3 , buyt.user_id , buyt.stock_id)'''     
+            with connection.cursor() as cursor:
+                cursor.execute(query1)
+                connection.commit()
         else :
             heapq.heappop(buy_orders)
             heapq.heappop(sell_orders)
-            b_user_port = Portfolio.objects.get(customer=buyt.user_id,stock=buyt.stock_id)
-            s_user_port = Portfolio.objects.get(customer=sellt.user_id,stock=sellt.stock_id)
+            query = '''SELECT max(id) FROM Transaction;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                op = dictfetchall(cursor)
+            # print(op)
+            buy_id = int(op[0]['max']) + 1
+            sell_id = int(op[0]['max']) + 2
+            query = '''SELECT * from Customer where id=user_id;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                user = dictfetchall(cursor)
+            new_value1 = user.balance - buyt2.price_per_share*buyt.num_shares
+            new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
+            new_value3 = user.invested_amount + buyt2.price_per_share*buyt.num_shares
+            query2 = '''Update Customer SET balance = %s , current_value = %s , invested_amount = %s , (new_value1,new_value2,new_value3)'''
+            with connection.cursor() as cursor:
+                cursor.execute(query2)
+            # b_user_port = Portfolio.objects.get(customer=buyt.user_id,stock=buyt.stock_id)
+            query = '''SELECT * from Portfolio where customer=buyt.user_id and stock=buyt.stock_id'''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                user_port = dictfetchall(cursor)
+            with connection.cursor() as cursor:
+                cursor.execute(query1)
+                connection.commit()
+            query1 = '''UPDATE Portfolio SET num_shares = %s, investes_amount = %s , current_value = %s WHERE customer = %s and stock = %s", (new_value1, new_value2,new_value3 , buyt.user_id , buyt.stock_id)'''
+            
+            # s_user_port = Portfolio.objects.get(customer=sellt.user_id,stock=sellt.stock_id)
+
+            sql = "INSERT INTO Transaction (id , customer , stock , date , num_shares , price_per_share , buy_or_sell) VALUES (%s, %s, %s , %s, %s, %s , %s)"
+            sql2 = "INSERT INTO Transaction (id , customer , stock , date , num_shares , price_per_share , buy_or_sell) VALUES (%s, %s, %s , %s, %s, %s , %s)"
+            with connection.cursor() as cursor:
+                cursor.execute(sql,val)
+                connection.commit()
+            with connection.cursor() as cursor:
+                cursor.execute(sql2,val1)
+                connection.commit()
             buyt.save()
             sellt.save()
             
