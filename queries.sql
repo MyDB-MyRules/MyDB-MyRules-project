@@ -221,7 +221,7 @@ INSERT INTO
         buy_or_sell
     )
 VALUES
-    (% s, % s, % s, % s, % s, % s, % s);
+    (:s, :s, :s, :s, :s, :s, :s);
 
 SELECT
     *
@@ -234,12 +234,12 @@ where
 UPDATE
     Portfolio
 SET
-    num_shares = % s,
-    investes_amount = % d,
-    current_value = % d
+    num_shares = :s,
+    investes_amount = :d,
+    current_value = :d
 WHERE
-    customer = % s
-    and stock = % s;
+    customer = :s
+    and stock = :s;
 
 INSERT INTO
     Derivatives (
@@ -255,7 +255,7 @@ INSERT INTO
         derivative_type
     )
 VALUES
-    (% s, % s, % s, % s, % s, % s, % s);
+    (:s, :s, :s, :s, :s, :s, :s);
 
 INSERT INTO
     Derivatives (
@@ -271,7 +271,7 @@ INSERT INTO
         derivative_type
     )
 VALUES
-    (% s, % s, % s, % s, % s, % s, % s);
+    (:s, :s, :s, :s, :s, :s, :s);
 
 insert into
     customer(id, name, balance)
