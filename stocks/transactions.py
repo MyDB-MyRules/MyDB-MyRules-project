@@ -75,6 +75,7 @@ def trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order):
 
     # Update the user balance and stock quantity
     # user.balance += total_revenue
+    print(buy_or_sell)
     if buy_or_sell == False:
         heapq.heappush(sell_orders, (price, trans))
     else:

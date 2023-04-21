@@ -12,7 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
 from .forms import BuySellForm
-from .transactions import trade_stock
+from .transactions import trade_stock, buy_orders, sell_orders, transact
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -299,6 +299,7 @@ def trade_stock_view(request):
             buy_or_sell = form.cleaned_data['buy_or_sell']
             price = form.cleaned_data['price']
             order = form.cleaned_data['order']
+            print(user_id, stock_id, quantity, buy_or_sell, price, order)
             # query = '''SELECT max(id) FROM Transaction;'''
             # with connection.cursor() as cursor:
             #     cursor.execute(query)

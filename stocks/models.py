@@ -19,8 +19,23 @@ class Customer(models.Model):
         managed = False
         db_table = 'customer'
 
-    def __repr__(self):
-        return f'<MyTable: MyTable object ({self.id}, {self.name}, {self.balance}, {self.current_value}, {self.invested_amount})>'
+
+class Derivatives(models.Model):
+    id = models.CharField(primary_key=True)
+    buyer = models.ForeignKey(Customer, models.DO_NOTHING)
+    seller = models.ForeignKey(Customer, models.DO_NOTHING, related_name='derivatives_seller_set')
+    stock = models.ForeignKey('StockMetadata', models.DO_NOTHING)
+    date = models.DateField()
+    num_shares = models.DecimalField(max_digits=65535, decimal_places=65535)
+    price_per_share = models.DecimalField(max_digits=65535, decimal_places=65535)
+    buy_or_sell = models.BooleanField()
+    execution_date = models.DateField()
+    premium = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    derivative_type = models.CharField()
+
+    class Meta:
+        managed = False
+        db_table = 'derivatives'
 
 
 class Portfolio(models.Model):
@@ -34,9 +49,6 @@ class Portfolio(models.Model):
         managed = False
         db_table = 'portfolio'
         unique_together = (('customer', 'stock'),)
-
-    def __repr__(self):
-        return f'<MyTable: MyTable object ({self.customer}, {self.stock}, {self.num_shares}, {self.invested_amount}, {self.current_value})>'
 
 
 class StockHistory(models.Model):
@@ -54,8 +66,6 @@ class StockHistory(models.Model):
         db_table = 'stock_history'
         unique_together = (('date', 'symbol'),)
 
-    def __repr__(self):
-        return f'<MyTable: MyTable object ({self.date}, {self.symbol}, {self.open}, {self.high}, {self.low}, {self.close}, {self.volume}, {self.turnover})>'
 
 class StockMetadata(models.Model):
     company_name = models.CharField()
@@ -68,25 +78,20 @@ class StockMetadata(models.Model):
         managed = False
         db_table = 'stock_metadata'
 
-    def __repr__(self):
-        return f'<MyTable: MyTable object ({self.company_name}, {self.industry}, {self.symbol}, {self.isin_code}, {self.price_per_share})>'
-
 
 class Transaction(models.Model):
     id = models.CharField(primary_key=True)
-    customer = models.ForeignKey(Customer, models.DO_NOTHING)
+    buyer = models.ForeignKey(Customer, models.DO_NOTHING)
+    seller = models.ForeignKey(Customer, models.DO_NOTHING, related_name='transaction_seller_set')
     stock = models.ForeignKey(StockMetadata, models.DO_NOTHING)
     date = models.DateField()
     num_shares = models.DecimalField(max_digits=65535, decimal_places=65535)
     price_per_share = models.DecimalField(max_digits=65535, decimal_places=65535)
-    buy_or_sell = models.BooleanField()
 
     class Meta:
         managed = False
         db_table = 'transaction'
 
-    def __repr__(self):
-        return f'<MyTable: MyTable object ({self.id}, {self.customer}, {self.stock}, {self.date}, {self.num_shares}, {self.price_per_share}, {self.buy_or_sell})>'
 
 class Userdata(models.Model):
     customer = models.ForeignKey(Customer, models.DO_NOTHING)
@@ -98,6 +103,3 @@ class Userdata(models.Model):
     class Meta:
         managed = False
         db_table = 'userdata'
-
-    def __repr__(self):
-        return f'<MyTable: MyTable object ({self.customer}, {self.name}, {self.username}, {self.email}, {self.password})>'
