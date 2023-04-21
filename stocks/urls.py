@@ -17,7 +17,8 @@ urlpatterns = [
     path('accounts/logout', views.logoutPage, name='logout'),
     path('accounts/deregister', views.deregisterPage, name='deregister'),
     path('accounts/dashboard', views.dashboard, name='dashboard'),
-    
+    path('users',views.user_names),
+    path('transaction',views.trade_stock_view),  
     
     
 ]

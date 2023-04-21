@@ -1,10 +1,5 @@
-<form action = "buy" method = "post">
+<form action = "" method = "post">
 	{% csrf_token %}
-    <label for="user_id">user_id: </label>
-    <input id="user_id" type="text" name="user_id">
-    <label for="stock_id">stock_id: </label>
-    <input id="user_id" type="text" name="user_id">
-    <label for="quantity">quantity: </label>
-    <input id="quantity" type="text" name="quantity">
-    <input type="submit" value="OK">
+	{{form }}
+	<input type="submit" value=Submit>
 </form>

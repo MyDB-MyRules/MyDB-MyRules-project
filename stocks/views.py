@@ -11,7 +11,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
-
+from .forms import BuySellForm
+from .transactions import trade_stock
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -47,7 +48,7 @@ select index,close2 - close1 as return from b;
     with connection.cursor() as cursor:
         cursor.execute(query, [stock_id])
         stock = dictfetchall(cursor)
-
+    #print(stock)
     return render(request, 'stock_return.html', {'stock': stock, 'stock_id': stock_id})
 
 
@@ -276,3 +277,38 @@ def moving_avg(request, stock_id):
         val = dictfetchall(cursor)
 
     return render(request, 'avg.html', {'avg': val})
+
+def user_names(request):
+    with connection.cursor() as cursor:
+        cursor.execute('''select * from Customer;''')
+        users = dictfetchall(cursor)
+    
+    return render (request, 'user_names.html', {'users': users})
+
+def trade_stock_view(request):
+    # Ensure that the request is a POST request
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = BuySellForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            user_id = form.cleaned_data['user_id']
+            stock_id = form.cleaned_data['stock_id']
+            quantity = form.cleaned_data['quantity']
+            buy_or_sell = form.cleaned_data['buy_or_sell']
+            price = form.cleaned_data['price']
+            order = form.cleaned_data['order']
+            # query = '''SELECT max(id) FROM Transaction;'''
+            # with connection.cursor() as cursor:
+            #     cursor.execute(query)
+            #     op = dictfetchall(cursor)
+            # # print(op)
+            # num_id = int(op[0]['max']) + 1
+            trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order)
+            # Return a response to the user indicating that the transaction was successful
+            # return render(request, 'buy_succesful.html')
+    else:
+        form = BuySellForm()
+    
+    return render(request , "transaction.html" , {"form" : form})
