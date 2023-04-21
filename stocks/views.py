@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
-from .forms import BuySellForm
+from .forms import BuySellForm, StockForm, StockAvg, StockCompForm, Stockpnl, StockPredictForm, StockRetForm, StockROI, StockTop10
 from .transactions import trade_stock, buy_orders, sell_orders, transact
 
 def stocksview(request):
@@ -31,7 +31,17 @@ def stocks_names(request):
     return render(request, 'stock_names.html', {'stocks': stocks})
 
 
-def one_stock(request, stock_id):
+def one_stock(request):
+    # Ensure that the request is a POST request
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = StockForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            stock_id = form.cleaned_data['stock_id']
+                
     with connection.cursor() as cursor:
         cursor.execute(
             '''select * from Stock_history where symbol = %s;''', [stock_id])
@@ -40,11 +50,20 @@ def one_stock(request, stock_id):
     return render(request, 'one_stock.html', {'stock': stock, 'stock_id': stock_id})
 
 
-def stock_ret(request, stock_id):
+def stock_ret(request):
     query = '''with a as (select row_number() over() as index, close from stock_history where symbol = %s), b as 
 (select a1.close as close1, a2.close as close2, a1.index from a a1, a a2 where a1.index= a2.index-1)
 select index,close2 - close1 as return from b;
 ;'''
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = StockRetForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            stock_id = form.cleaned_data['stock_id']
+
     with connection.cursor() as cursor:
         cursor.execute(query, [stock_id])
         stock = dictfetchall(cursor)
@@ -52,7 +71,7 @@ select index,close2 - close1 as return from b;
     return render(request, 'stock_return.html', {'stock': stock, 'stock_id': stock_id})
 
 
-def stock_pnl(request, stock_id, doi):
+def stock_pnl(request):
     query = """
     with old as 
     (
@@ -72,18 +91,75 @@ def stock_pnl(request, stock_id, doi):
     select ((latest.close - old.close) / old.close) * 100 as pnl 
     from old, latest;
     """
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = Stockpnl(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            stock_id = form.cleaned_data['stock_id']
+            doi = form.cleaned_data['doi']
 
     with connection.cursor() as cursor:
         cursor.execute(query, [stock_id, doi, stock_id])
         stock = dictfetchall(cursor)
 
-    print(stock)
     # return render (request, 'stock_return.html', {'stock': stock, 'stock_id': stock_id})
     return HttpResponse(stock[0]['pnl'])
 
+def stock_roi(request):
+    query = """
+    with old as 
+    (
+        select symbol, close 
+        from stock_history
+        where date = %s
+    ), 
+    latest as 
+    (
+        select symbol, close, date 
+        from stock_history
+        order by date desc
+        limit 1
+    ), 
+    pnl as 
+    (    
+        select old.symbol, 
+            ((latest.close - old.close) / old.close) * 100 as pnl 
+        from old, latest
+        where old.symbol = latest.symbol
+    )
 
-def compare_2_stocks(request, stock_id1, stock_id2):
+    select * from pnl where pnl > %s;    
+    """
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = StockROI(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            doi = form.cleaned_data['doi']
+            cutoff = form.cleaned_data['cutoffprofit']
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [doi, cutoff])
+        stock = dictfetchall(cursor)
+
+    return render(request, 'roi.html', {'stocks' : stock})
+
+def compare_2_stocks(request):
     query = '''with a as (select * from stock_history where symbol = %s), b as (select * from stock_history where symbol = %s) select a.date, a.close as close1, b.close as close2 from a, b where a.date = b.date; '''
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = StockCompForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            stock_id1 = form.cleaned_data['stock_id1']
+            stock_id2 = form.cleaned_data['stock_id2']
 
     with connection.cursor() as cursor:
         cursor.execute(query, [stock_id1, stock_id2])
@@ -91,6 +167,65 @@ def compare_2_stocks(request, stock_id1, stock_id2):
 
     return render(request, 'stock_comp.html', {'stock': stock, 'stock_id1': stock_id1, 'stock_id2': stock_id2})
 
+def moving_avg(request):
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = StockRetForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            stock_id = form.cleaned_data['stock_id']
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            '''
+        with a as 
+        (
+        SELECT * from  stock_history
+        WHERE symbol = %s ORDER BY date DESC
+        LIMIT 30
+        )
+        SELECT AVG(close)
+        FROM a group by symbol;''', [stock_id])
+        val = dictfetchall(cursor)
+
+    return render(request, 'avg.html', {'avg': val})
+
+def top10(request):
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = StockTop10(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            doi = form.cleaned_data['doi']
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            '''    with old as 
+    (
+        select symbol, close 
+        from stock_history
+        where date = %s
+    ), 
+    latest as 
+    (
+        select distinct on (symbol) symbol, close, date 
+        from stock_history
+        order by symbol, date desc
+    ) 
+    select old.symbol, 
+        ((latest.close - old.close) / old.close) * 100 as pnl 
+    from old, latest
+    where old.symbol = latest.symbol
+    order by pnl desc
+    limit 10;
+''', [doi])
+        val = dictfetchall(cursor)
+
+    return render(request, 'top10.html', {'top10': val})
 
 def register_user(username, password, customer_id, name, email):
     query = '''
@@ -203,33 +338,52 @@ def deregisterPage(request):
 
 
 def dashboard(request):
-    return render(request, 'dashboard.html', {})
+    form2 = StockForm()
+    form3 = StockRetForm()
+    form4 = StockCompForm()
+    form5 = StockPredictForm()
+    form6 = Stockpnl()
+    form7 = StockROI()
+    form8 = StockAvg()
+    form9 = StockTop10()
+    return render(request, 'dashboard.html', {'form2':form2, 'form3':form3, 'form4':form4, 'form5':form5, 'form6':form6, 'form7':form7, 'form8':form8, 'form9':form9})
 
 # predict prices
 
 
-def predict_prices(request, stock_id):
+def predict_prices(request):
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = StockRetForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            stock_id = form.cleaned_data['stock_id']
+
     with connection.cursor() as cursor:
         cursor.execute(
-            '''select * from past100prices where symbol = %s;''', [stock_id])
+            '''select date, symbol, open, high, low, close, volume, turnover from past100prices where symbol = %s;''', [stock_id])
         stocks = dictfetchall(cursor)
-
-    df = pd.DataFrame(stocks[len(stocks)-1])
-
-    for i in range(len(stocks)-2, -1, -1):
+    #print(stocks[len(stocks)-1])
+    df = pd.DataFrame(stocks[0], index=[0])
+    #print(df)
+    for i in range(1, len(stocks)):
         stock = stocks[i]
-        df = df.append(stock, ignore_index=True)
+        df.loc[len(df.index)] = stock
 
     seriesdata = df.sort_index(ascending=True, axis=0)
     new_seriesdata = pd.DataFrame(index=range(
-        0, len(df)), columns=['Date', 'Close'])
+        0, len(df)), columns=['date', 'close'])
     length_of_data = len(seriesdata)
+
+    print(new_seriesdata)
     for i in range(0, length_of_data):
         new_seriesdata['date'][i] = seriesdata['date'][i]
         new_seriesdata['close'][i] = seriesdata['close'][i]
     # setting the index again
-    new_seriesdata.index = new_seriesdata.Date
-    new_seriesdata.drop('Date', axis=1, inplace=True)
+    new_seriesdata.index = new_seriesdata.date
+    new_seriesdata.drop('date', axis=1, inplace=True)
     # creating train and test sets this comprises the entire data’s present in the dataset
     myseriesdataset = new_seriesdata.values
     totrain = myseriesdataset[0:80, :]
@@ -268,15 +422,6 @@ def predict_prices(request, stock_id):
     myclosing_priceresult = scalerdata.inverse_transform(myclosing_priceresult)
 
     return render(request, 'predict.html', {'price': myclosing_priceresult})
-
-
-def moving_avg(request, stock_id):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            '''select sum(close)/30 from stock_history where symbol = %s order by date desc limit 30;''')
-        val = dictfetchall(cursor)
-
-    return render(request, 'avg.html', {'avg': val})
 
 def user_names(request):
     with connection.cursor() as cursor:
