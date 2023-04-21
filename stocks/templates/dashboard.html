@@ -1,16 +1,131 @@
-<!-- <a href="{% url 'stocks_names' %}">All Stocks</a>
-check 1 stock history <br>
-<form action = "" method = "post">
-	{% csrf_token %}
-    <label for="stock_id">stock_id: </label>
-    <input id="stock_id" type="text" name="stock_id">
-    <input type="submit" value="OK">
-</form> -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dashboard</title>
+    <style>
+      /* Style for the header */
+      header {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+        font-size: 30px;
+      }
 
-<h1> Dashboard </h1>
+      /* Style for the main content area */
+      main {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 20px;
+      }
 
-<nav>
-    <span id="hello-msg"> Hello, {{request.user}} </span>
-    <span> <a href="{% url 'logout' %}"> Logout </a> </span>
-    <span> <a href="{% url 'deregister' %}"> Deregister </a> </span>    
-</nav>
+      /* Style for individual dashboard cards */
+      .card {
+        background-color: #f2f2f2;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+        padding: 20px;
+        width: 20%;
+      }
+
+      /* Style for the footer */
+      footer {
+        background-color: #eeefdf;
+        color: #fff;
+        padding: 10px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Dashboard</h1>
+    </header>
+    <h3>Hello, {{request.user}}!!</h3>
+    <main>
+      <div class="card">
+        <h2>Check all stocks</h2>
+        <p><a href="{% url 'stocks_names' %}"> All stocks</a></p>
+      </div>
+
+      <div class="card">
+        <h2>Check out the stock history of a stock</h2>
+        <form action = "stocks2" method = "post">
+          {% csrf_token %}
+          {{form2 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Check out the return of a stock</h2>
+        <form action = "stocks3" method = "post">
+          {% csrf_token %}
+          {{form3 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Compare prices of 2 stocks</h2>
+        <form action = "stocks4" method = "post">
+          {% csrf_token %}
+          {{form4 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Predict price of </h2>
+        <form action = "stocks5" method = "post">
+          {% csrf_token %}
+          {{form5 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Pnl of stock</h2>
+        <form action = "stocks6" method = "post">
+          {% csrf_token %}
+          {{form6 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>roi of stock</h2>
+        <form action = "stocks7" method = "post">
+          {% csrf_token %}
+          {{form7 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>moving avg of stock</h2>
+        <form action = "stocks8" method = "post">
+          {% csrf_token %}
+          {{form8 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Top 10 best performing stocks</h2>
+        <form action = "stocks9" method = "post">
+          {% csrf_token %}
+          {{form9 }}
+          <input type="submit" value=Submit>
+        </form>
+      </div>
+
+    </main>
+
+    <footer>
+      <p><a href="{% url 'logout' %}"> Logout </a></p>
+      <p><a href="{% url 'deregister' %}"> Deregister</p>
+    </footer>
+  </body>
+</html>
