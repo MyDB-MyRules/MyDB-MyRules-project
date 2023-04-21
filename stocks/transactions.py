@@ -5,6 +5,8 @@ from django.db import connection
 import heapq
 from collections import deque
 
+
+
 class transactn:
     def __init__(self, customer , stock , date , num_shares , price_per_share ):
         self.customer = customer
@@ -431,25 +433,24 @@ def trade_stock(user_id, stock_id, quantity , buy_or_sell,price , order):
     # print(buy_orders)
     # print(sell_orders)
     print(market_buy)
-    # print(market_sell)
-    # Update the user balance and stock quantity
-    # user.balance += total_revenue
-    
-    
-    # Save the changes to the database
-    # user.save()
-    # stock.save()
-    # transaction.save()
+@transaction.atomic()
+def transact():
+    for key in buy_orders:
+        while transa(key) != -1 :
+            continue
 
 #for a stock
 @transaction.atomic()
-def transact(stock_id):
+def transa(stock_id):
+    if(len(market_buy[stock_id])==0 and len(buy_orders[stock_id])==0) or (len(market_sell[stock_id])==0 and len(sell_orders[stock_id])==0):
+        return -1
+        
     query = '''SELECT max(id) FROM Transaction;'''
     with connection.cursor() as cursor:
         cursor.execute(query)
         op = dictfetchall(cursor)
     buy_id = int(op[0]['max']) + 1
-    if(len(market_buy)==0 and len(market_sell)==0):
+    if(len(market_buy[stock_id])==0 and len(market_sell[stock_id])==0):
         buyt = heapq.heappop(buy_orders[stock_id])
         sellt= heapq.heappop(sell_orders[stock_id])
         
@@ -637,7 +638,7 @@ def transact(stock_id):
                     connection.commit()
                 
     else:
-        if(len(market_buy)==0):
+        if(len(market_buy[stock_id])==0):
             sellt = market_sell[stock_id].popleft(0)
             buyt = heapq.heappop(buy_orders[stock_id])
             if(buyt.num_shares>sellt.num_shares):
@@ -815,7 +816,7 @@ def transact(stock_id):
                     cursor.execute(query1,[new_value1, new_value2, sellt.user_id , buyt.stock_id])
                     connection.commit()
             
-        elif(len(market_sell)==0):
+        elif(len(market_sell[stock_id])==0):
             buyt = market_buy[stock_id].popleft(0)
             sellt= heapq.heappop(sell_orders[stock_id])
             if(buyt.num_shares>sellt.num_shares):
@@ -1172,4 +1173,4 @@ def transact(stock_id):
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[new_value1, new_value2, sellt.user_id , buyt.stock_id])
                     connection.commit()
-        
+    return 0    
