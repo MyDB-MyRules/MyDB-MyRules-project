@@ -6,13 +6,12 @@ import heapq
 
 
 class transactn:
-    def __init__(self, customer , stock , date , num_shares , price_per_share , buy_or_sell):
+    def __init__(self, customer , stock , date , num_shares , price_per_share ):
         self.customer = customer
         self.stock = stock 
         self.date = date
         self.num_shares= num_shares
         self.price_per_share = price_per_share
-        self.buy_or_sell = buy_or_sell 
     
 def dictfetchall(cursor):
     desc = cursor.description     
@@ -24,18 +23,18 @@ sell_orders = []
 #adding and subracting in portdolio
 
 @transaction.atomic()
-def trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order):
+def trade_stock(user_id, stock_id, quantity , buy_or_sell,price ):
     # Get the user and stock objects
     query = '''SELECT * from Customer where id=%s;'''
-    query1 = '''SELECT * from StockMetadata where symbol=%s;'''
-    query2 = '''SELECT * from Portfolio where customer=%s and stock=%s;'''
+    query1 = '''SELECT * from Stock_Metadata where symbol=%s;'''
+    query2 = '''SELECT * from Portfolio where  customer_id=%s and stock_id=%s;'''
     
     with connection.cursor() as cursor:
-        cursor.execute(query,user_id)
+        cursor.execute(query,[user_id])
         user = dictfetchall(cursor)
         
     with connection.cursor() as cursor:
-        cursor.execute(query1,stock_id)
+        cursor.execute(query1,[stock_id])
         stock = dictfetchall(cursor)
         
     with connection.cursor() as cursor:
@@ -50,14 +49,14 @@ def trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order):
     
     today = date.today()
     
-    total_cost = quantity * stock.price_per_share
+    total_cost = quantity * stock[0]['price_per_share']
     
     # No. of shares are initialised to 0 when a profile is created for a customer
     # Check if the user has enough quantity of the stock to sell
-    if user_port.num_shares < quantity and buy_or_sell==False:
+    if user_port[0]['num_shares'] < quantity and buy_or_sell==False:
         raise ValueError("Not enough quantity of this stock to sell")
     
-    if user.balance < total_cost and buy_or_sell==True:
+    if user[0]['balance'] < total_cost and buy_or_sell==True:
         raise ValueError("Not enough balance to buy this stock")
 
     # Calculate the total revenue of the transaction
@@ -69,13 +68,11 @@ def trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order):
         stock=stock_id,
         date = today,
         num_shares=quantity,
-        price_per_share =price,
-        buy_or_sell=buy_or_sell
+        price_per_share =price
     )
 
     # Update the user balance and stock quantity
     # user.balance += total_revenue
-    print(buy_or_sell)
     if buy_or_sell == False:
         heapq.heappush(sell_orders, (price, trans))
     else:
@@ -96,7 +93,6 @@ def transact():
         cursor.execute(query)
         op = dictfetchall(cursor)
     buy_id = int(op[0]['max']) + 1
-    sell_id = int(op[0]['max']) + 2
     if buyt.price_per_share>=sellt.price_per_share:
         if(buyt.num_shares>sellt.num_shares):
             buyt2 = buyt
@@ -107,9 +103,9 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[buyt.customer_id])
                 user = dictfetchall(cursor)
-            new_value1 = user.balance - buyt2.price_per_share*buyt2.num_shares
+            new_value1 = user[0]['balance'] - buyt2.price_per_share*buyt2.num_shares
             # new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
-            new_value2 = user.invested_amount + buyt2.price_per_share*buyt2.num_shares
+            new_value2 = user[0]['invested_amount'] + buyt2.price_per_share*buyt2.num_shares
             query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query2,[new_value1,new_value2,buyt.customer_id])
@@ -119,7 +115,7 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[sellt.customer_id])
                 user = dictfetchall(cursor)
-            new_value1 = user.balance + buyt2.price_per_share*buyt2.num_shares
+            new_value1 = user[0]['balance'] + buyt2.price_per_share*buyt2.num_shares
             # new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
             query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
             with connection.cursor() as cursor:
@@ -140,8 +136,8 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[buyt.user_id,buyt.stock_id])
                 user_port = dictfetchall(cursor)
-            new_value1 = user_port.invested_amount + sellt.price_per_share*buyt2.num_shares
-            new_value2 = user_port.num_shares + sellt.price_per_share*buyt2.num_shares
+            new_value1 = user_port[0]['invested_amount'] + sellt.price_per_share*buyt2.num_shares
+            new_value2 = user_port[0]['num_shares'] + sellt.price_per_share*buyt2.num_shares
             query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[new_value1, new_value2, buyt.user_id , buyt.stock_id])
@@ -151,8 +147,8 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[sellt.user_id,buyt.stock_id])
                 user_port = dictfetchall(cursor)
-            new_value1 = user_port.invested_amount + sellt.price_per_share*buyt2.num_shares
-            new_value2 = user_port.num_shares + sellt.price_per_share*buyt2.num_shares
+            new_value1 = user_port[0]['invested_amount'] + sellt.price_per_share*buyt2.num_shares
+            new_value2 = user_port[0]['num_shares'] + sellt.price_per_share*buyt2.num_shares
             query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[new_value1, new_value2, sellt.user_id , buyt.stock_id])
@@ -170,9 +166,9 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[buyt.customer_id])
                 user = dictfetchall(cursor)
-            new_value1 = user.balance - sellt2.price_per_share*sellt2.num_shares
+            new_value1 = user[0]['balance'] - sellt2.price_per_share*sellt2.num_shares
             # new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
-            new_value2 = user.invested_amount + sellt2.price_per_share*sellt2.num_shares
+            new_value2 = user[0]['invested_amount'] + sellt2.price_per_share*sellt2.num_shares
             query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query2,[new_value1,new_value2,buyt.customer_id])
@@ -182,7 +178,7 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[sellt.customer_id])
                 user = dictfetchall(cursor)
-            new_value1 = user.balance + sellt2.price_per_share*sellt2.num_shares
+            new_value1 = user[0]['balance'] + sellt2.price_per_share*sellt2.num_shares
             # new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
             query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
             with connection.cursor() as cursor:
@@ -203,8 +199,8 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[buyt.user_id,buyt.stock_id])
                 user_port = dictfetchall(cursor)
-            new_value1 = user_port.invested_amount + sellt2.price_per_share*sellt2.num_shares
-            new_value2 = user_port.num_shares + sellt2.price_per_share*sellt2.num_shares
+            new_value1 = user_port[0]['invested_amount'] + sellt2.price_per_share*sellt2.num_shares
+            new_value2 = user_port[0]['num_shares'] + sellt2.price_per_share*sellt2.num_shares
             query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[new_value1, new_value2, buyt.user_id , buyt.stock_id])
@@ -214,8 +210,8 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[sellt.user_id,buyt.stock_id])
                 user_port = dictfetchall(cursor)
-            new_value1 = user_port.invested_amount + sellt2.price_per_share*sellt2.num_shares
-            new_value2 = user_port.num_shares + sellt2.price_per_share*sellt2.num_shares
+            new_value1 = user_port[0]['invested_amount'] + sellt2.price_per_share*sellt2.num_shares
+            new_value2 = user_port[0]['num_shares'] + sellt2.price_per_share*sellt2.num_shares
             query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[new_value1, new_value2, sellt.user_id , buyt.stock_id])
@@ -230,9 +226,9 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[buyt.customer_id])
                 user = dictfetchall(cursor)
-            new_value1 = user.balance - sellt.price_per_share*sellt.num_shares
+            new_value1 = user[0]['balance'] - sellt.price_per_share*sellt.num_shares
             # new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
-            new_value2 = user.invested_amount + sellt.price_per_share*sellt.num_shares
+            new_value2 = user[0]['invested_amount'] + sellt.price_per_share*sellt.num_shares
             query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query2,[new_value1,new_value2,buyt.customer_id])
@@ -242,7 +238,7 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[sellt.customer_id])
                 user = dictfetchall(cursor)
-            new_value1 = user.balance + sellt.price_per_share*sellt.num_shares
+            new_value1 = user[0]['balance'] + sellt.price_per_share*sellt.num_shares
             # new_value2 = user.current_value + buyt2.price_per_share*buyt.num_shares
             query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
             with connection.cursor() as cursor:
@@ -263,8 +259,8 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[buyt.user_id,buyt.stock_id])
                 user_port = dictfetchall(cursor)
-            new_value1 = user_port.invested_amount + sellt.price_per_share*sellt.num_shares
-            new_value2 = user_port.num_shares + sellt.price_per_share*sellt.num_shares
+            new_value1 = user_port[0]['invested_amount'] + sellt.price_per_share*sellt.num_shares
+            new_value2 = user_port[0]['num_shares'] + sellt.price_per_share*sellt.num_shares
             query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[new_value1, new_value2, buyt.user_id , buyt.stock_id])
@@ -274,8 +270,8 @@ def transact():
             with connection.cursor() as cursor:
                 cursor.execute(query,[sellt.user_id,buyt.stock_id])
                 user_port = dictfetchall(cursor)
-            new_value1 = user_port.invested_amount + sellt.price_per_share*sellt.num_shares
-            new_value2 = user_port.num_shares + sellt.price_per_share*sellt.num_shares
+            new_value1 = user_port[0]['invested_amount'] + sellt.price_per_share*sellt.num_shares
+            new_value2 = user_port[0]['num_shares'] + sellt.price_per_share*sellt.num_shares
             query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[new_value1, new_value2, sellt.user_id , buyt.stock_id])
