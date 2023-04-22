@@ -4,7 +4,7 @@ from datetime import date
 from django.db import connection
 import heapq
 from collections import deque
-
+import time
 
 
 class transactn:
@@ -434,12 +434,17 @@ def trade_stock(user_id, stock_id, quantity , buy_or_sell,price , order):
     # print(sell_orders)
     print(market_buy['ASIANPAINT'])
     print(market_sell['ASIANPAINT'])
+    print(buy_orders['ASIANPAINT'])
+    print(sell_orders['ASIANPAINT'])
 @transaction.atomic()
 def transact():
-    for key in buy_orders:
-        while transa(key) != -1 :
-            print(888888888888)
-            continue
+    while(True):
+        time.sleep(200)
+        for key in buy_orders:
+            print(key)
+            while transa(key) != -1 :
+                print(888888888888)
+            
 
 #for a stock
 @transaction.atomic()
@@ -451,7 +456,9 @@ def transa(stock_id):
     with connection.cursor() as cursor:
         cursor.execute(query)
         op = dictfetchall(cursor)
-    buy_id = int(op[0]['max']) + 1
+    buy_id = 1
+    if(len(op[0])!=0) :
+        buy_id = int(op[0]['max']) + 1
     if(len(market_buy[stock_id])==0 and len(market_sell[stock_id])==0):
         buyt = heapq.heappop(buy_orders[stock_id])
         sellt= heapq.heappop(sell_orders[stock_id])
