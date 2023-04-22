@@ -1,4 +1,8 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserChangeForm
+from django.forms import ModelForm
+from django.contrib.auth.models import User 
  
 # creating a form
 class BuySellForm(forms.Form):
@@ -12,3 +16,9 @@ class BuySellForm(forms.Form):
         ('limit', 'Limit Order'),
     ]
     order = forms.ChoiceField(choices=MY_CHOICES)
+    
+class CreateUserForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+    

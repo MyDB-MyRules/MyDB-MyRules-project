@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
-from .forms import BuySellForm
+from .forms import BuySellForm, CreateUserForm
 from .transactions import trade_stock, buy_orders, sell_orders, transact
 
 def stocksview(request):
@@ -154,10 +154,10 @@ def auth_user(username, password):
 
 
 def registerPage(request):
-    form = UserCreationForm()
+    form = CreateUserForm()
 
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CreateUserForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
@@ -201,8 +201,11 @@ def deregisterPage(request):
     deregister_user(username)
     return redirect('register')
 
-
 def dashboard(request):
+# check if relation has been updated
+    with connection.cursor() as cursor:
+        cursor.execute('select * from transaction;')
+        print(dictfetchall(cursor))    
     return render(request, 'dashboard.html', {})
 
 # predict prices
