@@ -9,7 +9,4 @@ class StocksConfig(AppConfig):
         from .transactions import transact
         t = CreateThread(transact)
         t.start()
-        print(t.is_alive())
-        t.join()
-        print(t.is_alive())
         return super().ready()
