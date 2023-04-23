@@ -1,11 +1,8 @@
-from django.db import transaction
-from .models import Transaction, Portfolio , Customer , StockMetadata
 from datetime import date
 from django.db import connection
 import heapq
 from collections import deque
 import time
-from decimal import Decimal
 
 class transactn:
     def __init__(self, customer , stock , date , num_shares , price_per_share ):
@@ -393,12 +390,19 @@ options_buy = {
 #adding and subracting in portdolio
 
 # @transaction.atomic()
-def trade_stock(user_id, stock_id, quantity , buy_or_sell,price , order):
+def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
     # Get the user and stock objects
+    query = '''select id from customer where name = %s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query, [user_name])
+        val = dictfetchall(cursor)
+        user_id = val[0]['id']
+
     query = '''SELECT * from Customer where id=%s;'''
     query1 = '''SELECT * from Stock_Metadata where symbol=%s;'''
     query2 = '''SELECT * from Portfolio where  customer_id=%s and stock_id=%s;'''
-    
+
+
     with connection.cursor() as cursor:
         cursor.execute(query,[user_id])
         user = dictfetchall(cursor)

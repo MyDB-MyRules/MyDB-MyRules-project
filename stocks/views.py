@@ -438,22 +438,22 @@ def trade_stock_view(request):
         # check whether it's valid:
         if form.is_valid():   
             # Retrieve the user ID, stock ID, and quantity from the request
-            user_id = form.cleaned_data['user_id']
+            user_name =request.user.username
             stock_id = form.cleaned_data['stock_id']
             quantity = form.cleaned_data['quantity']
             buy_or_sell = form.cleaned_data['buy_or_sell']
             price = form.cleaned_data['price']
             order = form.cleaned_data['order']
-            print(user_id, stock_id, quantity, buy_or_sell, price, order)
+            print(user_name, stock_id, quantity, buy_or_sell, price, order)
             # query = '''SELECT max(id) FROM Transaction;'''
             # with connection.cursor() as cursor:
             #     cursor.execute(query)
             #     op = dictfetchall(cursor)
             # # print(op)
             # num_id = int(op[0]['max']) + 1
-            trade_stock(user_id, stock_id, quantity , buy_or_sell,price ,order)
+            trade_stock(user_name, stock_id, quantity , buy_or_sell,price ,order)
             # Return a response to the user indicating that the transaction was successful
-            # return render(request, 'buy_succesful.html')
+            return redirect('success')
     else:
         form = BuySellForm()
     
@@ -474,7 +474,8 @@ def options(request):
             premium = options_buy[stock_id][trans_id][3]
             execution_time = options_buy[stock_id][trans_id][4]
             
-            derivatives(buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)       
+            derivatives(buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)     
+            return redirect('success')  
             # insert option to derivatives table
     else:
         form = OptionsForm()
@@ -491,6 +492,10 @@ def buy_options(request):
             execution_time = float(form.cleaned_data['execution_time'])
             user= request.user.username
             options_buy[stock_id].append((user, num_shares, price_per_share, premium, execution_time))
+            return redirect('success')
     else:
         form = BuyOptionsForm()
     return render(request, 'buy_options.html', {'form':form})
+
+def success(request):
+    return render(request, 'success.html')

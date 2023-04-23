@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
  
 # creating a form
 class BuySellForm(forms.Form):
-    user_id = forms.CharField()
     stock_id = forms.CharField()
     quantity = forms.DecimalField()
     buy_or_sell = forms.BooleanField(required=False)

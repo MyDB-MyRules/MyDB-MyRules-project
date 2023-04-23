@@ -22,4 +22,5 @@ urlpatterns = [
     path('transaction',views.trade_stock_view, name='transaction'),
     path('options',views.options, name='options'),
     path('buy_options',views.buy_options, name='buy_options'),
+    path('success', views.success, name='success'),
 ]
