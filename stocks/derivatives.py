@@ -27,8 +27,8 @@ def derivatives(request, buyer, seller, stock_id, num_shares, price_per_share,pr
         val = dictfetchall(cursor)
         seller_id = val[0]['id']
 
-    query = '''insert into derivatives values(%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)'''
-    params = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,False,'2024-05-09',premium,'options']
+    query = '''insert into derivatives values(%s,%s,%s,%s,%s,%s,%s,%s,%s, %s)'''
+    params = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']
 
 
     with connection.cursor() as cursor:

@@ -21,15 +21,14 @@ class Customer(models.Model):
 
 
 class Derivatives(models.Model):
-    id = models.CharField(primary_key=True)
+    id = models.CharField()
     buyer = models.ForeignKey(Customer, models.DO_NOTHING)
     seller = models.ForeignKey(Customer, models.DO_NOTHING, related_name='derivatives_seller_set')
     stock = models.ForeignKey('StockMetadata', models.DO_NOTHING)
     date = models.DateField()
     num_shares = models.DecimalField(max_digits=65535, decimal_places=65535)
     price_per_share = models.DecimalField(max_digits=65535, decimal_places=65535)
-    buy_or_sell = models.BooleanField()
-    execution_date = models.DateField()
+    execution_time = models.DecimalField(max_digits=65535, decimal_places=65535)
     premium = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     derivative_type = models.CharField()
 
@@ -80,7 +79,7 @@ class StockMetadata(models.Model):
 
 
 class Transaction(models.Model):
-    id = models.CharField(primary_key=True)
+    id = models.CharField()
     buyer = models.ForeignKey(Customer, models.DO_NOTHING)
     seller = models.ForeignKey(Customer, models.DO_NOTHING, related_name='transaction_seller_set')
     stock = models.ForeignKey(StockMetadata, models.DO_NOTHING)
