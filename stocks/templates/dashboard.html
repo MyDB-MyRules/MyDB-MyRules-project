@@ -44,6 +44,7 @@
     </header>
     <h3>Hello, {{request.user}}!!</h3>
     <main>
+      {% include 'messages.html' %}
       <div class="card">
         <h2>Check all stocks</h2>
         <p><a href="{% url 'stocks_names' %}"> All stocks</a></p>
@@ -142,5 +143,11 @@
       <p><a href="{% url 'logout' %}"> Logout </a></p>
       <p><a href="{% url 'deregister' %}"> Deregister</p>
     </footer>
+
+    <script>
+      setTimeout(function() {
+        document.querySelector('.alert').remove();
+      }, 5000);
+    </script>
   </body>
 </html>

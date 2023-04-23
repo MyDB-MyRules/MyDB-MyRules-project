@@ -1,5 +1,6 @@
 import threading
 from time import sleep
+from django.contrib import messages
 
 class CreateThread1(threading.Thread):
     def __init__(self, func):
@@ -13,7 +14,9 @@ class CreateThread1(threading.Thread):
             print(e)  
 
 class CreateThread2(threading.Thread):
-    def __init__(self, execution_time):
+    def __init__(self, request, derivative_id, execution_time):
+        self.derivative_id = derivative_id
+        self.request = request
         self.execution_time = execution_time
         threading.Thread.__init__(self)
     
@@ -23,5 +26,8 @@ class CreateThread2(threading.Thread):
             sleep(float(self.execution_time)*60)
             print("woke up, now notify the person")
             # notify
+            messages.success(self.request, 'Your option %s has been executed. Please accept the transaction by proceeding to the accept_options page.' % self.derivative_id)
+            print('Your option %s has been executed. Please accept the transaction by proceeding to the accept_options page.' % self.derivative_id)
+            
         except Exception as e:
             print(e)

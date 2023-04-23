@@ -108,19 +108,18 @@
 					</form>
 
 				</div>
-		
-				<div class="mt-4">
-					<div class="d-flex justify-content-center links">
-                        <h4>Sell Options</h4>
-                        <ol>
-                            {% for symbol, orders in options.items %}
-                            <li>{{symbol}} : {{orders}}</li>
-                            {% endfor %}
-                        </ol>                        
-					</div>
-			
-				</div>
 			</div>
+            <div class="mt-4">
+                <div class="d-flex justify-content-center h-100">
+                    <h4>Sell Options</h4>
+                    <ol>
+                        {% for symbol, orders in options.items %}
+                        <li>{{symbol}} : {{orders}}</li>
+                        {% endfor %}
+                    </ol>                        
+                </div>
+        
+            </div>            
 		</div>
 	</div>
 </body>

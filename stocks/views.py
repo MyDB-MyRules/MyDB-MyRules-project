@@ -1,5 +1,6 @@
+import time
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.db import connection
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import UserChangeForm
@@ -14,6 +15,7 @@ from keras.layers import Dense, Dropout, LSTM
 from .forms import *
 from .transactions import trade_stock, buy_orders, sell_orders, transact, options_buy
 from .derivatives import derivatives
+from django.contrib import messages
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -252,7 +254,7 @@ def register_user(username, password, customer_id, name, email):
 
     with connection.cursor() as cursor:
         cursor.execute(query, [username, password, customer_id, name, email])
-
+        
 # # check if relation has been updated
 #     with connection.cursor() as cursor:
 #         cursor.execute('select * from userdata;')
@@ -301,6 +303,7 @@ def registerPage(request):
             register_user(username=username, password=password, customer_id=username +
                           '001', name=username, email=username + '@gmail.com')
             form.save()
+            messages.success(request, 'User registered successfully')  
 
             return redirect('login')
 
@@ -474,12 +477,23 @@ def options(request):
             premium = options_buy[stock_id][trans_id][3]
             execution_time = options_buy[stock_id][trans_id][4]
             
-            derivatives(buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)     
-            return redirect('success')  
+            request_copy = HttpRequest()
+            request_copy = request
+            derivatives(request_copy, buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)     
+            time.sleep(5)
+            return redirect('dashboard')
+            # time.sleep(5)
+            # return redirect('dashboard')  
             # insert option to derivatives table
     else:
         form = OptionsForm()
-    return render(request, 'options.html', {'options': options_buy, 'form': form})
+    
+    options_avail = {}
+    for (symbol, orders) in options_buy.items():
+        if(len(orders) != 0):
+            options_avail[symbol] = orders
+            
+    return render(request, 'options.html', {'options': options_avail, 'form': form})
 
 def buy_options(request):
     if request.method == 'POST':

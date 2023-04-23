@@ -6,7 +6,7 @@ def dictfetchall(cursor):
     desc = cursor.description
     return [dict(zip([col[0] for col in desc], row)) for row in cursor.fetchall()]
 
-def derivatives(buyer, seller, stock_id, num_shares, price_per_share,premium, execution_time):
+def derivatives(request, buyer, seller, stock_id, num_shares, price_per_share,premium, execution_time):
     today = date.today()
     today = date.isoformat(today)
     
@@ -36,7 +36,7 @@ def derivatives(buyer, seller, stock_id, num_shares, price_per_share,premium, ex
 
     # start thread for sleeping
     print('done')
-    t=CreateThread2(execution_time)
+    t=CreateThread2(request, id, execution_time)
     t.start()
     # this will create new threads for each derivative done
 
