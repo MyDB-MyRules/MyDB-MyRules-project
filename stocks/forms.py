@@ -54,3 +54,10 @@ class StockTop10(forms.Form):
 class OptionsForm(forms.Form):
     stock_id = forms.CharField()
     trans_id = forms.CharField()
+
+class BuyOptionsForm(forms.Form):
+    stock_id = forms.CharField()
+    num_shares = forms.DecimalField()
+    price_per_share = forms.DecimalField()
+    premium = forms.DecimalField()
+    execution_time = forms.DecimalField()

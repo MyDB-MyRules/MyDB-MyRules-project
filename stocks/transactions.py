@@ -72,7 +72,7 @@ buy_orders  = {
     'ZEEL': []
 }
 
-sell_orders = stock_dict = {
+sell_orders ={
     'ADANIPORTS': [],
     'ASIANPAINT': [],
     'AXISBANK': [],
@@ -338,7 +338,7 @@ stop_sell  = {
 }
 
 options_buy = {
-    'ADANIPORTS': [1, 2, 3],
+    'ADANIPORTS': [],
     'ASIANPAINT': [],
     'AXISBANK': [],
     'BAJAJAUTO': [],
@@ -352,7 +352,7 @@ options_buy = {
     'DRREDDY': [],
     'EICHERMOT': [],
     'GAIL': [],
-    'GRASIM': [4, 5],
+    'GRASIM': [],
     'HCLTECH': [],
     'HDFC': [],
     'HDFCBANK': [],
@@ -365,7 +365,7 @@ options_buy = {
     'INFY': [],
     'IOC': [],
     'ITC': [],
-    'JSWSTEEL': [6],
+    'JSWSTEEL': [],
     'KOTAKBANK': [],
     'LT': [],
     'M&M': [],
@@ -386,8 +386,8 @@ options_buy = {
     'ULTRACEMCO': [],
     'UPL': [],
     'VEDL': [],
-    'WIPRO': [7],
-    'ZEEL': [20]
+    'WIPRO': [],
+    'ZEEL': []
 }
 
 #adding and subracting in portdolio

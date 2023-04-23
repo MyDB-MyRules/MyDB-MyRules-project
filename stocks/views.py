@@ -13,6 +13,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
 from .forms import *
 from .transactions import trade_stock, buy_orders, sell_orders, transact, options_buy
+from .derivatives import derivatives
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -459,14 +460,37 @@ def trade_stock_view(request):
     return render(request , "transaction.html" , {"form" : form})
 
 def options(request):
-    form = OptionsForm()
+    
     if request.method == 'POST':
         form = OptionsForm(request.POST)
         if form.is_valid():
             stock_id = form.cleaned_data['stock_id']
-            trans_id = form.cleaned_data['trans_id']
-
-            print(stock_id, trans_id)
+            trans_id = int(form.cleaned_data['trans_id'])
+            
+            buyer = options_buy[stock_id][trans_id][0]
+            seller = request.user.username
+            num_shares = options_buy[stock_id][trans_id][1]
+            price_per_share = options_buy[stock_id][trans_id][2]
+            premium = options_buy[stock_id][trans_id][3]
+            execution_time = options_buy[stock_id][trans_id][4]
+            
+            derivatives(buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)       
             # insert option to derivatives table
-
+    else:
+        form = OptionsForm()
     return render(request, 'options.html', {'options': options_buy, 'form': form})
+
+def buy_options(request):
+    if request.method == 'POST':
+        form = BuyOptionsForm(request.POST)
+        if form.is_valid():
+            stock_id = form.cleaned_data['stock_id']
+            num_shares = float(form.cleaned_data['num_shares'])
+            price_per_share = float(form.cleaned_data['price_per_share'])
+            premium = float(form.cleaned_data['premium'])
+            execution_time = float(form.cleaned_data['execution_time'])
+            user= request.user.username
+            options_buy[stock_id].append((user, num_shares, price_per_share, premium, execution_time))
+    else:
+        form = BuyOptionsForm()
+    return render(request, 'buy_options.html', {'form':form})
