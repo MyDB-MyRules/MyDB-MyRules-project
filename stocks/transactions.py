@@ -337,6 +337,59 @@ stop_sell  = {
     'ZEEL': []
 }
 
+options_buy = {
+    'ADANIPORTS': [1, 2, 3],
+    'ASIANPAINT': [],
+    'AXISBANK': [],
+    'BAJAJAUTO': [],
+    'BAJAJFINSV': [],
+    'BAJFINANCE': [],
+    'BHARTIARTL': [],
+    'BPCL': [],
+    'BRITANNIA': [],
+    'CIPLA': [],
+    'COALINDIA': [],
+    'DRREDDY': [],
+    'EICHERMOT': [],
+    'GAIL': [],
+    'GRASIM': [4, 5],
+    'HCLTECH': [],
+    'HDFC': [],
+    'HDFCBANK': [],
+    'HEROMOTOCO': [],
+    'HINDALCO': [],
+    'HINDUNILVR': [],
+    'ICICIBANK': [],
+    'INDUSINDBK': [],
+    'INFRATEL': [],
+    'INFY': [],
+    'IOC': [],
+    'ITC': [],
+    'JSWSTEEL': [6],
+    'KOTAKBANK': [],
+    'LT': [],
+    'M&M': [],
+    'MARUTI': [],
+    'NESTLEIND': [],
+    'NTPC': [],
+    'ONGC': [],
+    'POWERGRID': [],
+    'RELIANCE': [],
+    'SBIN': [],
+    'SHREECEM': [],
+    'SUNPHARMA': [],
+    'TATAMOTORS': [],
+    'TATASTEEL': [],
+    'TCS': [],
+    'TECHM': [],
+    'TITAN': [],
+    'ULTRACEMCO': [],
+    'UPL': [],
+    'VEDL': [],
+    'WIPRO': [7],
+    'ZEEL': [20]
+}
+
 #adding and subracting in portdolio
 
 # @transaction.atomic()
@@ -509,24 +562,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt2[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt2[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 
                 #adding the remaining to queue
@@ -572,24 +625,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt2[1].price_per_share*sellt2[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt2[1].price_per_share*sellt2[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 sellt[1].num_shares -= buyt[1].num_shares
                 heapq.heappush(sell_orders[stock_id], (sellt[1].price_per_share, sellt))  
@@ -635,29 +688,29 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 
     else:
         if(len(market_buy[stock_id])==0):
-            sellt = market_sell[stock_id].popleft(0)
+            sellt = market_sell[stock_id].popleft()
             buyt = heapq.heappop(buy_orders[stock_id])
             if(buyt[1].num_shares>sellt[1].num_shares):
                 #buyer
@@ -696,24 +749,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + buyt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + buyt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[ new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[ new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 
                 #adding the remaining to queue
@@ -756,24 +809,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + buyt[1].price_per_share*buyt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + buyt[1].price_per_share*buyt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 sellt[1].num_shares -= buyt[1].num_shares
                 market_sell[stock_id].appendleft(sellt)  
@@ -814,28 +867,28 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
             
         elif(len(market_sell[stock_id])==0):
-            buyt = market_buy[stock_id].popleft(0)
+            buyt = market_buy[stock_id].popleft()
             sellt= heapq.heappop(sell_orders[stock_id])
             if(buyt[1].num_shares>sellt[1].num_shares):
                 #buyer
@@ -874,24 +927,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 
                 #adding the remaining to queue
@@ -935,24 +988,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 sellt[1].num_shares -= buyt[1].num_shares
                 heapq.heappush(sell_orders[stock_id], (sellt[1].price_per_share, sellt))  
@@ -993,30 +1046,30 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
         
         else:
             # print(1111111111111111111111111)
-            buyt = market_buy[stock_id].popleft(0)
-            sellt = market_sell[stock_id].popleft(0)
+            buyt = market_buy[stock_id].popleft()
+            sellt = market_sell[stock_id].popleft()
             if(buyt[1].num_shares>sellt[1].num_shares):
                 #buyer
                 query = '''SELECT * from Customer where id=%s;'''
@@ -1054,24 +1107,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[ new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[ new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 
                 #adding the remaining to queue
@@ -1115,24 +1168,24 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + buyt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[ new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[ new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
                 sellt[1].num_shares -= buyt[1].num_shares
                 market_sell[stock_id].appendleft(sellt)  
@@ -1173,23 +1226,23 @@ def transa(stock_id):
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[buyt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[buyt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] + sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value1, new_value2, buyt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value1, new_value2, buyt[1].customer , buyt[1].stock])
                     connection.commit()
                 #seller
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query,[sellt[1].user_id,buyt[1].stock])
+                    cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*sellt[1].num_shares
                 new_value2 = user_port[0]['num_shares'] - sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[new_value2, sellt[1].user_id , buyt[1].stock])
+                    cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
                     connection.commit()
     return 0    

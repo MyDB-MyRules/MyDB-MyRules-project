@@ -11,8 +11,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
-from .forms import BuySellForm, StockForm, StockAvg, StockCompForm, Stockpnl, StockPredictForm, StockRetForm, StockROI, StockTop10, CreateUserForm
-from .transactions import trade_stock, buy_orders, sell_orders, transact
+from .forms import *
+from .transactions import trade_stock, buy_orders, sell_orders, transact, options_buy
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -457,3 +457,16 @@ def trade_stock_view(request):
         form = BuySellForm()
     
     return render(request , "transaction.html" , {"form" : form})
+
+def options(request):
+    form = OptionsForm()
+    if request.method == 'POST':
+        form = OptionsForm(request.POST)
+        if form.is_valid():
+            stock_id = form.cleaned_data['stock_id']
+            trans_id = form.cleaned_data['trans_id']
+
+            print(stock_id, trans_id)
+            # insert option to derivatives table
+
+    return render(request, 'options.html', {'options': options_buy, 'form': form})

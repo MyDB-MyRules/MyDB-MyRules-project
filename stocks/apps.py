@@ -8,5 +8,7 @@ class StocksConfig(AppConfig):
     def ready(self) -> None:
         from .transactions import transact
         t = CreateThread(transact)
+        # die when the main thread dies 
+        t.daemon = True 
         t.start()
         return super().ready()

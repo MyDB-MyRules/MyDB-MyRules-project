@@ -10,8 +10,7 @@ urlpatterns = [
     path('stocks5', views.predict_prices, name='predict_prices'),
      path('stocks8', views.moving_avg, name='avg'),
     path('stocks3', views.stock_ret, name='stock_ret'),
-    path('stocks6',
-         views.stock_pnl, name='stock_pnl'),
+    path('stocks6', views.stock_pnl, name='stock_pnl'),
      path('stocks9', views.top10, name='stock_top10'),
      path('stocks7', views.stock_roi, name='stock_roi'),
     path('register', views.registerPage, name='register'),
@@ -21,4 +20,5 @@ urlpatterns = [
     path('dashboard', views.dashboard, name='dashboard'),
     path('users',views.user_names),
     path('transaction',views.trade_stock_view),
+    path('options',views.options, name='options'),
 ]
