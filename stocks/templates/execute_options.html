@@ -2,7 +2,7 @@
 <html>
     
 <head>
-	<title>Options</title>
+	<title>Execute Options</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
@@ -81,7 +81,7 @@
 				<div class="d-flex justify-content-center">
 
 
-					<h3 id="form-title">Options</h3>
+					<h3 id="form-title">Accept/Deny</h3>
 				</div>
 				<div class="d-flex justify-content-center form_container">
 					<form method="POST" action="">
@@ -91,14 +91,14 @@
 								<span class="input-group-text"><i class="fas fa-user"></i></span>
 							</div>
 							<!-- <input type="text" name="stock_id" placeholder="Stock ID..." class="form-control"> -->
-                            {{form.stock_id}}
+                            {{form.trans_id}}
 						</div>
 						<div class="input-group mb-2">
 							<div class="input-group-append">
 								<span class="input-group-text"><i class="fas fa-key"></i></span>
 							</div>
 								<!-- <input type="text" name="trans_id" placeholder="Transaction ID..." class="form-control" > -->
-                                {{form.trans_id}}
+                                {{form.accept}}
 						</div>
 
 							<div class="d-flex justify-content-center mt-3 login_container">
@@ -110,7 +110,7 @@
 			</div>
             <div class="mt-4">
                 <div class="d-flex justify-content-center h-100">
-                    <h4>Sell Options</h4>
+                    <h4>Mature Options</h4>
                     <ol>
                         {% for symbol, orders in options.items %}
                         <li>{{symbol}} : {{orders}}</li>

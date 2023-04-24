@@ -16,6 +16,7 @@ from .forms import *
 from .transactions import trade_stock, buy_orders, sell_orders, transact, options_buy
 from .derivatives import derivatives
 from django.contrib import messages
+from .threads import options_to_execute
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -477,9 +478,7 @@ def options(request):
             premium = options_buy[stock_id][trans_id][3]
             execution_time = options_buy[stock_id][trans_id][4]
             
-            request_copy = HttpRequest()
-            request_copy = request
-            derivatives(request_copy, buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)     
+            derivatives(request, buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)     
             time.sleep(5)
             return redirect('dashboard')
             # time.sleep(5)
@@ -510,6 +509,37 @@ def buy_options(request):
     else:
         form = BuyOptionsForm()
     return render(request, 'buy_options.html', {'form':form})
+
+def execute_options(request):
+    
+    if request.method == 'POST':
+        form = ExecuteOptionsForm(request.POST)
+        if form.is_valid():
+            user_name =request.user.username
+            trans_id = int(form.cleaned_data['trans_id'])
+            accept = form.cleaned_data['accept']
+
+            print('trans_id = %s accept = %s', trans_id, accept)    
+            
+            # transaction = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']
+            for i in range(len(options_to_execute)):
+                txn = options_to_execute[i]
+                if(txn[0] == trans_id):
+                    stock_id = txn[3]
+                    quantity = txn[5]
+                    buy_or_sell = True
+                    price = txn[6]
+                    order = 'limit'
+                    
+                    break
+                    
+            trade_stock(user_name, stock_id, quantity , buy_or_sell,price ,order)
+                    
+            return redirect('dashboard')  
+    else:
+        form = ExecuteOptionsForm()
+            
+    return render(request, 'options.html', {'options': options_to_execute, 'form': form})
 
 def success(request):
     return render(request, 'success.html')

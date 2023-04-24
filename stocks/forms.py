@@ -60,3 +60,10 @@ class BuyOptionsForm(forms.Form):
     price_per_share = forms.DecimalField()
     premium = forms.DecimalField()
     execution_time = forms.DecimalField()
+    
+
+class ExecuteOptionsForm(forms.Form):
+    # stock_id = forms.CharField()
+    trans_id = forms.CharField()
+    accept = forms.BooleanField(required=False)
+    

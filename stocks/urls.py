@@ -23,4 +23,5 @@ urlpatterns = [
     path('options',views.options, name='options'),
     path('buy_options',views.buy_options, name='buy_options'),
     path('success', views.success, name='success'),
+    path('execute_options', views.execute_options, name='execute_options'),
 ]

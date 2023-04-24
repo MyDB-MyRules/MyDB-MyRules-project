@@ -36,7 +36,7 @@ def derivatives(request, buyer, seller, stock_id, num_shares, price_per_share,pr
 
     # start thread for sleeping
     print('done')
-    t=CreateThread2(request, id, execution_time)
+    t=CreateThread2(request, execution_time, params)
     t.start()
     # this will create new threads for each derivative done
 
