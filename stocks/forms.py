@@ -63,7 +63,5 @@ class BuyOptionsForm(forms.Form):
     
 
 class ExecuteOptionsForm(forms.Form):
-    # stock_id = forms.CharField()
-    trans_id = forms.CharField()
-    accept = forms.BooleanField(required=False)
+    sno = forms.CharField()
     

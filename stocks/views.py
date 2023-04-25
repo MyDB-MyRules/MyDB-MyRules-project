@@ -1,3 +1,4 @@
+import copy
 import time
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpRequest
@@ -16,7 +17,7 @@ from .forms import *
 from .transactions import trade_stock, buy_orders, sell_orders, transact, options_buy
 from .derivatives import derivatives
 from django.contrib import messages
-from .threads import options_to_execute
+from .thread import options_to_execute
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -342,6 +343,9 @@ def deregisterPage(request):
     return redirect('register')
 
 def dashboard(request):
+    if(len(options_to_execute) != 0):
+        messages.success(request, 'Your option has been executed. Please accept the transaction by proceeding to the accept_options page.')
+    
     form2 = StockForm()
     form3 = StockRetForm()
     form4 = StockCompForm()
@@ -478,12 +482,10 @@ def options(request):
             premium = options_buy[stock_id][trans_id][3]
             execution_time = options_buy[stock_id][trans_id][4]
             
-            derivatives(request, buyer,seller,stock_id, num_shares,price_per_share, premium,execution_time)     
-            time.sleep(5)
+            # request_copy = copy.copy(request)
+            derivatives(request,buyer,seller,stock_id, num_shares,price_per_share, premium, execution_time)     
+            # messages.warning(request, 'Transaction Successful')
             return redirect('dashboard')
-            # time.sleep(5)
-            # return redirect('dashboard')  
-            # insert option to derivatives table
     else:
         form = OptionsForm()
     
@@ -515,23 +517,21 @@ def execute_options(request):
     if request.method == 'POST':
         form = ExecuteOptionsForm(request.POST)
         if form.is_valid():
-            user_name =request.user.username
-            trans_id = int(form.cleaned_data['trans_id'])
-            accept = form.cleaned_data['accept']
+            user_name = request.user.username
+            sno = int(form.cleaned_data['sno'])
 
-            print('trans_id = %s accept = %s', trans_id, accept)    
+            print('sno = %s', sno)    
+            txn = options_to_execute[sno - 1]
+            options_to_execute.pop(sno - 1)
             
-            # transaction = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']
-            for i in range(len(options_to_execute)):
-                txn = options_to_execute[i]
-                if(txn[0] == trans_id):
-                    stock_id = txn[3]
-                    quantity = txn[5]
-                    buy_or_sell = True
-                    price = txn[6]
-                    order = 'limit'
-                    
-                    break
+            print('txn = %s', txn)
+            # txn = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']
+            
+            stock_id = txn[3]
+            quantity = txn[5]
+            buy_or_sell = True
+            price = txn[6]
+            order = 'limit'  
                     
             trade_stock(user_name, stock_id, quantity , buy_or_sell,price ,order)
                     
@@ -539,7 +539,7 @@ def execute_options(request):
     else:
         form = ExecuteOptionsForm()
             
-    return render(request, 'options.html', {'options': options_to_execute, 'form': form})
+    return render(request, 'execute_options.html', {'options': options_to_execute, 'form': form})
 
 def success(request):
     return render(request, 'success.html')

@@ -43,8 +43,9 @@
       <h1>Dashboard</h1>
     </header>
     <h3>Hello, {{request.user}}!!</h3>
+    {% include 'messages.html' %}
+
     <main>
-      {% include 'messages.html' %}
       <div class="card">
         <h2>Check all stocks</h2>
         <p><a href="{% url 'stocks_names' %}"> All stocks</a></p>
@@ -135,6 +136,11 @@
       <div class="card">
         <h2>Buy options</h2>
         <p><a href="{% url 'buy_options' %}">Place order for options</a></p>
+      </div>
+
+      <div class="card">
+        <h2>Execute Mature options</h2>
+        <p><a href="{% url 'execute_options' %}">Accept mature options</a></p>
       </div>
 
     </main>

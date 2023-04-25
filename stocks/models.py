@@ -21,7 +21,7 @@ class Customer(models.Model):
 
 
 class Derivatives(models.Model):
-    id = models.CharField()
+    id = models.CharField(primary_key=True)
     buyer = models.ForeignKey(Customer, models.DO_NOTHING)
     seller = models.ForeignKey(Customer, models.DO_NOTHING, related_name='derivatives_seller_set')
     stock = models.ForeignKey('StockMetadata', models.DO_NOTHING)
@@ -79,7 +79,7 @@ class StockMetadata(models.Model):
 
 
 class Transaction(models.Model):
-    id = models.CharField()
+    id = models.CharField(primary_key=True)
     buyer = models.ForeignKey(Customer, models.DO_NOTHING)
     seller = models.ForeignKey(Customer, models.DO_NOTHING, related_name='transaction_seller_set')
     stock = models.ForeignKey(StockMetadata, models.DO_NOTHING)
