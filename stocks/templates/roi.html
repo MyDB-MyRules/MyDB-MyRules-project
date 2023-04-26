@@ -1,1 +1,18 @@
-{{stocks}}
+{% if stocks %}
+<p><b>Stocks with required Return of investment include:</b></p>
+<table>
+    <tr>
+        <th>Name of stock</th>
+        <th>Profit/Loss of stock</th>
+    </tr>
+        {% for element in stocks %}
+    <tr>
+        <td>{{ element.symbol }}</td>
+        <td>{{ element.pnl }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{%else%}
+There are no stocks that satisfy the criteria.
+{%endif %}

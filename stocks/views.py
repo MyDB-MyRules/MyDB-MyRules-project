@@ -195,7 +195,7 @@ def moving_avg(request):
         FROM a group by symbol;''', [stock_id])
         val = dictfetchall(cursor)
 
-    return render(request, 'avg.html', {'avg': val})
+    return render(request, 'avg.html', {'avg': val[0]['avg']})
 
 def top10(request):
     if request.method == "POST":
@@ -346,18 +346,36 @@ def dashboard(request):
     if(len(options_to_execute) != 0):
         messages.success(request, 'Your option has been executed. Please accept the transaction by proceeding to the accept_options page.')
     
-    form2 = StockForm()
-    form3 = StockRetForm()
-    form4 = StockCompForm()
+    query0  = '''select id from customer where name = %s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query0, [request.user.username])
+        id = dictfetchall(cursor)[0]['id']
+
+    query = '''select * from portfolio where customer_id = %s and num_shares > 0;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query, [id])
+        portfolio = dictfetchall(cursor)
+        
+    return render(request, 'dashboard.html', {'portfolio' : portfolio})
+# predict prices
+
+def q1(request):
     form5 = StockPredictForm()
     form6 = Stockpnl()
     form7 = StockROI()
     form8 = StockAvg()
     form9 = StockTop10()
-    return render(request, 'dashboard.html', {'form2':form2, 'form3':form3, 'form4':form4, 'form5':form5, 'form6':form6, 'form7':form7, 'form8':form8, 'form9':form9})
 
-# predict prices
+    return render(request, 'q1.html', {'form5':form5, 'form6':form6, 'form7':form7, 'form8':form8, 'form9':form9})
 
+def q2(request):
+    form2 = StockForm()
+    form4 = StockCompForm()
+
+    return render(request, 'q2.html', {'form2':form2, 'form4':form4})
+
+def q4(request):
+    return render (request, 'q4.html', {})
 
 def predict_prices(request):
     if request.method == "POST":
@@ -371,7 +389,7 @@ def predict_prices(request):
 
     with connection.cursor() as cursor:
         cursor.execute(
-            '''select date, symbol, open, high, low, close, volume, turnover from past100prices where symbol = %s;''', [stock_id])
+            '''select date, close from past100prices where symbol = %s;''', [stock_id])
         stocks = dictfetchall(cursor)
     #print(stocks[len(stocks)-1])
     df = pd.DataFrame(stocks[0], index=[0])
@@ -380,56 +398,42 @@ def predict_prices(request):
         stock = stocks[i]
         df.loc[len(df.index)] = stock
 
-    seriesdata = df.sort_index(ascending=True, axis=0)
-    new_seriesdata = pd.DataFrame(index=range(
-        0, len(df)), columns=['date', 'close'])
-    length_of_data = len(seriesdata)
+    training_set = df.iloc[:, 1:2].values
+    sc = MinMaxScaler(feature_range=(0,1))
+    training_set_scaled = sc.fit_transform(training_set)
 
-    print(new_seriesdata)
-    for i in range(0, length_of_data):
-        new_seriesdata['date'][i] = seriesdata['date'][i]
-        new_seriesdata['close'][i] = seriesdata['close'][i]
-    # setting the index again
-    new_seriesdata.index = new_seriesdata.date
-    new_seriesdata.drop('date', axis=1, inplace=True)
-    # creating train and test sets this comprises the entire data’s present in the dataset
-    myseriesdataset = new_seriesdata.values
-    totrain = myseriesdataset[0:80, :]
-    tovalid = myseriesdataset[80:, :]
-    # converting dataset into x_train and y_train
-    scalerdata = MinMaxScaler(feature_range=(0, 1))
-    scale_data = scalerdata.fit_transform(myseriesdataset)
-    x_totrain, y_totrain = [], []
-    length_of_totrain = len(totrain)
-    for i in range(60, length_of_totrain):
-        x_totrain.append(scale_data[i-60:i, 0])
-        y_totrain.append(scale_data[i, 0])
-    x_totrain, y_totrain = np.array(x_totrain), np.array(y_totrain)
-    x_totrain = np.reshape(
-        x_totrain, (x_totrain.shape[0], x_totrain.shape[1], 1))
-    # LSTM neural network
-    lstm_model = Sequential()
-    lstm_model.add(LSTM(units=50, return_sequences=True,
-                   input_shape=(x_totrain.shape[1], 1)))
-    lstm_model.add(LSTM(units=50))
-    lstm_model.add(Dense(1))
-    lstm_model.compile(loss='mean_squared_error', optimizer='adadelta')
-    lstm_model.fit(x_totrain, y_totrain, epochs=3, batch_size=1, verbose=2)
-    # predicting next data stock price
-    myinputs = new_seriesdata[len(
-        new_seriesdata) - (len(tovalid)+1) - 60:].values
-    myinputs = myinputs.reshape(-1, 1)
-    myinputs = scalerdata.transform(myinputs)
-    tostore_test_result = []
-    for i in range(60, myinputs.shape[0]):
-        tostore_test_result.append(myinputs[i-60:i, 0])
-    tostore_test_result = np.array(tostore_test_result)
-    tostore_test_result = np.reshape(
-        tostore_test_result, (tostore_test_result.shape[0], tostore_test_result.shape[1], 1))
-    myclosing_priceresult = lstm_model.predict(tostore_test_result)
-    myclosing_priceresult = scalerdata.inverse_transform(myclosing_priceresult)
+    X_train = []
+    y_train = []
+    for i in range(5, 100):
+        X_train.append(training_set_scaled[i-5:i, 0])
+        y_train.append(training_set_scaled[i, 0])
+    X_train, y_train = np.array(X_train), np.array(y_train)
+    X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 
-    return render(request, 'predict.html', {'price': myclosing_priceresult})
+
+    from keras.models import Sequential
+    from keras.layers import LSTM
+    from keras.layers import Dropout
+    from keras.layers import Dense
+
+    model = Sequential()
+    model.add(LSTM(units=50,return_sequences=True,input_shape=(X_train.shape[1], 1)))
+    model.add(Dropout(0.2))
+    model.add(LSTM(units=50,return_sequences=True))
+    model.add(Dropout(0.2))
+    model.add(LSTM(units=50,return_sequences=True))
+    model.add(Dropout(0.2))
+    model.add(LSTM(units=50))
+    model.add(Dropout(0.2))
+    model.add(Dense(units=1))
+    model.compile(optimizer='adam',loss='mean_squared_error')
+
+
+
+    model.fit(X_train,y_train,epochs=10,batch_size=8)
+    predicted_stock_price = model.predict(X_train[94])
+    predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+    return render(request, 'predict.html', {'price': predicted_stock_price[0]})
 
 def user_names(request):
     with connection.cursor() as cursor:
@@ -485,7 +489,7 @@ def options(request):
             # request_copy = copy.copy(request)
             derivatives(request,buyer,seller,stock_id, num_shares,price_per_share, premium, execution_time)     
             # messages.warning(request, 'Transaction Successful')
-            return redirect('dashboard')
+            return redirect('success')
     else:
         form = OptionsForm()
     
@@ -535,7 +539,7 @@ def execute_options(request):
                     
             trade_stock(user_name, stock_id, quantity , buy_or_sell,price ,order)
                     
-            return redirect('dashboard')  
+            return redirect('success')  
     else:
         form = ExecuteOptionsForm()
             
@@ -543,3 +547,4 @@ def execute_options(request):
 
 def success(request):
     return render(request, 'success.html')
+

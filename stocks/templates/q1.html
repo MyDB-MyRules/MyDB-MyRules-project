@@ -197,44 +197,110 @@
   </head>
   <body>
     <header>
-      <h1>Place Orders</h1>
+      <h1>Essentials about stocks</h1>
     </header>
+    {% include 'messages.html' %}
     <main>
+
       <section id="orders">
-        <h2>Orders</h2>
-        <form action = "" method = "post">
+        <h2>Predict price of a stock</h2>
+        <form action = "stocks5" method = "post">
+			{% csrf_token %}
+          <div class="input-group">
+            <label for="stock_id">Symbol</label>
+            <input type="text" id="symbol" name="stock_id" required>
+          </div>
+          <button type="submit">Place Order</button>
+        </form>
+      </section>
+      <br>
+      <br>
+      <br>
+      <hr>
+      <br>
+      <br>
+      <br>
+      <section id="orders">
+        <h2>Moving average of a stock</h2>
+        <form action = "stocks8" method = "post">
+			{% csrf_token %}
+          <div class="input-group">
+            <label for="stock_id">Symbol</label>
+            <input type="text" id="symbol" name="stock_id" required>
+          </div>
+          <button type="submit">Place Order</button>
+        </form>
+      </section>
+      <br>
+      <br>
+      <br>
+      <hr>
+      <br>
+      <br>
+      <br>
+      <section id="orders">
+        <h2>Top 10 best performing stocks</h2>
+        <form action = "stocks9" method = "post">
+			{% csrf_token %}
+          <div class="input-group">
+            <label for="doi">Starting date of investment</label>
+            <input type="text" id="symbol" name="doi" required>
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </section>
+      <br>
+      <br>
+      <br>
+      <hr>
+      <br>
+      <br>
+      <br>
+      <section id="orders">
+        <h2>Profit and loss of a stock</h2>
+        <form action = "stocks6" method = "post">
 			{% csrf_token %}
           <div class="input-group">
             <label for="stock_id">Symbol</label>
             <input type="text" id="symbol" name="stock_id" required>
           </div>
           <div class="input-group">
-            <label for="quantity">Number of Shares</label>
-            <input type="number" id="shares" name="quantity" required>
+            <label for="doi">Date of investment</label>
+            <input type="text" id="symbol" name="doi" required>
           </div>
-          <div class="input-group">
-            <label for="price">Price</label>
-            <input type="number" id="price" name="price" required>
-          </div>
-          <div class="input-group">
-            <label for="buy_or_sell">Order Buy or sell</label>
-            <select id="order-type" name="buy_or_sell" required>
-              <option value="">Select Buy or Sell</option>
-              <option value="buy">Buy</option>
-              <option value="sell">Sell</option>
-            </select>
-          </div>
-		  <div class="input-group">
-            <label for="order">Order Type</label>
-            <select id="order-type" name="order" required>
-              <option value="">Select Order Type</option>
-              <option value="market">Market Order</option>
-              <option value="limit">Limit Order</option>
-            </select>
-          </div>
-          <button type="submit">Place Order</button>
+          <button type="submit">Submit</button>
         </form>
       </section>
+      <br>
+      <br>
+      <br>
+      <hr>
+      <br>
+      <br>
+      <br>
+      <section id="orders">
+        <h2>Return of investment of a stock</h2>
+        <form action = "stocks7" method = "post">
+			{% csrf_token %}
+          <div class="input-group">
+            <label for="cutoffprofit">Cut off profit</label>
+            <input type="text" id="symbol" name="cutoffprofit" required>
+          </div>
+          <div class="input-group">
+            <label for="doi">Date of investment</label>
+            <input type="text" id="symbol" name="doi" required>
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </section>
+
     </main>
+
+  </main>
+  <script>
+    setTimeout(function() {
+      document.querySelector('.alert').remove();
+    }, 5000);
+  </script>
 </body>
 </html>

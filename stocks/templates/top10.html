@@ -1,1 +1,13 @@
-{{top10}}
+<p><b>Top 10 stocks are</b></p>
+<table>
+    <tr>
+        <th>Name of stock</th>
+        <th>Profit/Loss of stock</th>
+    </tr>
+        {% for element in top10 %}
+    <tr>
+        <td>{{ element.symbol }}</td>
+        <td>{{ element.pnl }}</td>
+    </tr>
+    {% endfor %}
+</table>

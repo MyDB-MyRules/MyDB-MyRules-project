@@ -24,4 +24,8 @@ urlpatterns = [
     path('buy_options',views.buy_options, name='buy_options'),
     path('success', views.success, name='success'),
     path('execute_options', views.execute_options, name='execute_options'),
+    path('user_names', views.user_names, name='user_names'),
+    path('q1', views.q1, name='q1'),
+    path('q2', views.q2, name='q2'),
+    path('q4', views.q4, name='q4'),
 ]
