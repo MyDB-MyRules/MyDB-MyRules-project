@@ -7,6 +7,11 @@ class StocksConfig(AppConfig):
     
     def ready(self) -> None:
         from .transactions import transact
+        from .views import register_marketmaker
+        
+        register_marketmaker()
+        
+        # create a thread to run the transaction manager
         t = CreateThread1(transact)
         # die when the main thread dies 
         t.daemon = True 

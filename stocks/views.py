@@ -232,7 +232,29 @@ def top10(request):
 
     return render(request, 'top10.html', {'top10': val})
 
-def register_user(username, password, customer_id, name, email):
+def register_marketmaker():
+    
+    with connection.cursor() as cursor:
+        cursor.execute('select 1 from customer where id = 0::varchar;')
+        output = dictfetchall(cursor)
+
+    if len(output) == 0:
+        query = '''
+        insert into 
+            customer(id, name, balance)
+        VALUES (%s, %s, %s);
+        '''
+        
+        with connection.cursor() as cursor:
+            cursor.execute(query, [0, 'marketmaker', 1000000000])
+
+def register_user(username, password, name, email):
+    
+    with connection.cursor() as cursor:
+        cursor.execute('select count(*) from customer;')
+        output = dictfetchall(cursor)
+        customer_id = output[0]['count'] + 1  
+    
     query = '''
     insert into 
         customer(id, name, balance)
@@ -301,9 +323,9 @@ def registerPage(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
+            email = form.cleaned_data['email']
 
-            register_user(username=username, password=password, customer_id=username +
-                          '001', name=username, email=username + '@gmail.com')
+            register_user(username=username, password=password, name=username, email=email)
             form.save()
             messages.success(request, 'User registered successfully')  
 
