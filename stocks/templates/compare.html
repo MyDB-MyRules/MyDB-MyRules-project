@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock History</title>
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+</head>
+
+<body>
+  <main class="container">
+    <section style="margin-bottom: 1.5rem;">
+      <hgroup>
+        <h2>Stock History</h2>
+      </hgroup>
+    </section>
+    <div class="grid" style="margin-bottom: 1.5rem;">
+      <canvas id="myChart" width="100%"></canvas>
+    </div>
+    <div class="grid" >
+        <canvas id="myChart2" width="100%"></canvas>
+    </div>
+    <div class="grid" >
+        <canvas id="myChart3" width="100%"></canvas>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [{% for item in dates %}"{{ item }}",{% endfor %}],
+        datasets: [{
+          label: 'Open For {{stock_id1}}',
+          data: [{% for item in opens %}{{ item }}, {% endfor %}],
+          backgroundColor: 'rgba(75, 12, 192, 0.2)',
+          borderColor: 'rgba(75, 12, 192, 1)',
+          borderWidth: 1
+        },
+        {
+        label: " Open For {{stock_id2}}",
+        data: [{% for item in opens2 %}{{ item }}, {% endfor %}],
+        backgroundColor: 'rgba(75, 12, 19, 0.2)',
+        borderColor: 'rgba(75, 12, 19, 1)',
+        borderWidth: 1
+        },
+        {
+            label: 'Close For {{stock_id1}}',
+            data: [{% for item in closes %}{{ item }}, {% endfor %}],
+            backgroundColor: 'rgba(7, 12, 192, 0.2)',
+            borderColor: 'rgba(7, 12, 192, 1)',
+            borderWidth: 1
+          },
+          {
+          label: " Close For {{stock_id2}}",
+          data: [{% for item in closes2 %}{{ item }}, {% endfor %}],
+          backgroundColor: 'rgba(7, 121, 19, 0.2)',
+          borderColor: 'rgba(7, 121, 19, 1)',
+          borderWidth: 1
+          },
+          {
+            label: 'High For {{stock_id1}}',
+            data: [{% for item in highs %}{{ item }}, {% endfor %}],
+            backgroundColor: 'rgba(75, 121, 192, 0.2)',
+            borderColor: 'rgba(75, 121, 192, 1)',
+            borderWidth: 1
+          },
+          {
+          label: " High For {{stock_id2}}",
+          data: [{% for item in highs2 %}{{ item }}, {% endfor %}],
+          backgroundColor: 'rgba(200, 12, 1, 0.2)',
+          borderColor: 'rgba(200, 12, 1, 1)',
+          borderWidth: 1
+          },
+          {
+            label: 'Low For {{stock_id1}}',
+            data: [{% for item in lows %}{{ item }}, {% endfor %}],
+            backgroundColor: 'rgba(200, 121, 192, 0.2)',
+            borderColor: 'rgba(200, 121, 192, 1)',
+            borderWidth: 1
+          },
+          {
+          label: " Low For {{stock_id2}}",
+          data: [{% for item in lows2 %}{{ item }}, {% endfor %}],
+          backgroundColor: 'rgba(200, 12, 191, 0.2)',
+          borderColor: 'rgba(200, 12, 191, 1)',
+          borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Graph: Stock Price',
+            font: {
+              style: 'normal',
+              lineHeight: 1.2,
+              size: 18,
+            },
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            display: true,
+            title: {
+              display: true,
+              text: 'Stock Price ($)',
+              font: {
+                style: 'normal',
+                lineHeight: 1.2
+              },
+              padding: { top: 0, left: 0, right: 0, bottom: 5 }
+            }
+          },
+          x: {
+            beginAtZero: true,
+            display: true,
+            title: {
+              display: true,
+              text: 'Date',
+              font: {
+                style: 'normal',
+                lineHeight: 1.2
+              },
+              padding: { top: 5, left: 0, right: 0, bottom: 0 }
+            }
+          }
+        }
+      }
+    });
+
+    const ctx2 = document.getElementById('myChart2').getContext('2d');
+    const myChart2 = new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: [{% for item in dates %}"{{ item }}",{% endfor %}],
+        datasets: [{
+          label: "Stock Volume of {{stock_id1}}",
+          data: [{% for item in volumes %}{{ item }}, {% endfor %}],
+          backgroundColor: 'rgba(7, 192, 192, 0.2)',
+          borderColor: 'rgba(7, 192, 192, 1)',
+          borderWidth: 1
+        },
+        {
+          label: "Stock Volume of {{stock_id2}}",
+          data: [{% for item in volumes2 %}{{ item }}, {% endfor %}],
+          backgroundColor: 'rgba(75, 192, 19, 0.2)',
+          borderColor: 'rgba(75, 192, 19, 1)',
+          borderWidth: 1
+        }
+        ]
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Graph: Stock Volume',
+            font: {
+              style: 'normal',
+              lineHeight: 1.2,
+              size: 18,
+            },
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            display: true,
+            title: {
+              display: true,
+              text: 'Stock Volume ($)',
+              font: {
+                style: 'normal',
+                lineHeight: 1.2
+              },
+              padding: { top: 0, left: 0, right: 0, bottom: 5 }
+            }
+          },
+          x: {
+            beginAtZero: true,
+            display: true,
+            title: {
+              display: true,
+              text: 'Date',
+              font: {
+                style: 'normal',
+                lineHeight: 1.2
+              },
+              padding: { top: 5, left: 0, right: 0, bottom: 0 }
+            }
+          }
+        }
+      }
+    });
+
+    const ctx3 = document.getElementById('myChart3').getContext('2d');
+    const myChart3 = new Chart(ctx3, {
+      type: 'line',
+      data: {
+        labels: [{% for item in dates %}"{{ item }}",{% endfor %}],
+        datasets: [{
+          label: "Stock Turnover for {{stock_id1}}",
+          data: [{% for item in turnovers %}{{ item }}, {% endfor %}],
+          backgroundColor: 'rgba(75, 192, 19, 0.2)',
+          borderColor: 'rgba(75, 192, 19, 1)',
+          borderWidth: 1
+        },
+        {
+            label: "Stock Turnover for {{stock_id2}}",
+            data: [{% for item in turnovers2 %}{{ item }}, {% endfor %}],
+            backgroundColor: 'rgba(75, 19, 192, 0.2)',
+            borderColor: 'rgba(75, 19, 192, 1)',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Graph: Stock Turnover',
+            font: {
+              style: 'normal',
+              lineHeight: 1.2,
+              size: 18,
+            },
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            display: true,
+            title: {
+              display: true,
+              text: 'Stock Turnover ($)',
+              font: {
+                style: 'normal',
+                lineHeight: 1.2
+              },
+              padding: { top: 0, left: 0, right: 0, bottom: 5 }
+            }
+          },
+          x: {
+            beginAtZero: true,
+            display: true,
+            title: {
+              display: true,
+              text: 'Date',
+              font: {
+                style: 'normal',
+                lineHeight: 1.2
+              },
+              padding: { top: 5, left: 0, right: 0, bottom: 0 }
+            }
+          }
+        }
+      }
+    });
+
+  </script>
+</body>
+</html>

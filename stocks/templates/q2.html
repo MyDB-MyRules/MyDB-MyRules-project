@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Trends</title>
+<style>
+/* Global styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #232a34;
+    color: #fff;
+  }
+  
+  h1 {
+    font-size: 32px;
+  }
+  
+  nav ul {
+    display: flex;
+  }
+  
+  nav li {
+    margin: 0 10px;
+  }
+  
+  nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  nav a:hover {
+    background-color: #3f4b5b;
+  }
+  
+  nav .active a {
+    background-color: #3f4b5b;
+  }
+  
+  main {
+    padding: 20px;
+  }
+  
+  /* Orders section */
+  #orders {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #orders h2 {
+    margin-bottom: 20px;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  
+  .input-group label {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .input-group input,
+  .input-group select {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  button[type="submit"] {
+    padding: 10px;
+    background-color: #2979ff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #2962ff;
+  }
+  
+  /* Funds section */
+  #funds {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #funds h2 {
+    margin-bottom: 20px;
+  }
+  
+  .info-box {
+    max-width: 400px;
+    width: 100%;
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .info-box h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .balance {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* Portfolio section */
+  #portfolio {
+    margin-top: 20px;
+  }
+  
+  #portfolio h2 {
+    margin-bottom: 20px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  th,
+  td {
+    padding: 10px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #232a34;
+    color: #fff;
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: green; 
+    color: #fff;
+    }
+
+    tbody tr:nth-child(odd) {
+    background-color: red;
+    color: white;
+    }
+
+    tbody tr:hover {
+    background-color: #3f4b5b;
+    color: #fff;
+    }
+
+    tbody tr td:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    }
+
+    tbody tr td:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    }
+
+</style>
+  </head>
+  <body>
+    <header>
+      <h1>Trends of stocks</h1>
+    </header>
+    {% include 'messages.html' %}
+    <main>
+
+      <section id="orders">
+        <h2>Check stock history trend of a stock</h2>
+        <form action = "stocks2" method = "post">
+			{% csrf_token %}
+          <div class="input-group">
+            <label for="stock_id">Symbol</label>
+            <input type="text" id="symbol" name="stock_id" required>
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </section>
+      <br>
+      <br>
+      <br>
+      <hr>
+      <br>
+      <br>
+      <br>
+      <section id="orders">
+        <h2>Compare 2 stocks</h2>
+        <form action = "stocks4" method = "post">
+			{% csrf_token %}
+          <div class="input-group">
+            <label for="stock_id1">Symbol of stock 1</label>
+            <input type="text" id="symbol" name="stock_id1" required>
+          </div>
+          <div class="input-group">
+            <label for="stock_id2">Symbol of stock 2</label>
+            <input type="text" id="symbol" name="stock_id2" required>
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </section>
+
+    </main>
+
+  </main>
+  <script>
+    setTimeout(function() {
+      document.querySelector('.alert').remove();
+    }, 5000);
+  </script>
+</body>
+</html>

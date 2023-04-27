@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Options and futures</title>
+    <style>
+      /* Style for the header */
+      header {
+        background-color: #052e55;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+        font-size: 30px;
+      }
+
+      /* Style for the main content area */
+      main {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 20px;
+      }
+
+      /* Style for individual dashboard cards */
+      .card {
+        background-color: #f2f2f2;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(76, 142, 208, 0.1);
+        margin: 10px;
+        padding: 50px;
+        width: 25%;
+      }
+
+      /* Style for the footer */
+      footer {
+        background-color: #eeefdf;
+        color: #fff;
+        padding: 10px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Options and Futures</h1>
+    </header>
+    {% include 'messages.html' %}
+
+    <main>
+
+      <div class="card">
+        <h2>Check options</h2>
+        <p><a href="{% url 'options' %}">Check the list of options</a></p>
+      </div>
+
+      <div class="card">
+        <h2>Buy options</h2>
+        <p><a href="{% url 'buy_options' %}">Place order for options</a></p>
+      </div>
+
+      <div class="card">
+        <h2>Execute Mature options</h2>
+        <p><a href="{% url 'execute_options' %}">Accept mature options</a></p>
+      </div>
+
+    </main>
+
+    <script>
+      setTimeout(function() {
+        document.querySelector('.alert').remove();
+      }, 5000);
+    </script>
+  </body>
+</html>
+
+

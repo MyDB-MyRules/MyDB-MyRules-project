@@ -1,0 +1,14 @@
+<p><b>{{stock_id1}}</b>     <b>{{stock_id2}}</b></p>
+<table>
+    <tr>
+        <th>date</th>
+        <th>close1</th>
+        <th>close2</th>
+        {% for element in stock %}
+    <tr>
+        <td>{{ element.date }}</td>
+        <td>{{ element.close1}}</td>
+        <td>{{ element.close2}}</td>
+    </tr>
+    {% endfor %}
+</table>
