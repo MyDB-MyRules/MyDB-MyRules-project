@@ -508,6 +508,31 @@ def options(request):
             premium = options_buy[stock_id][trans_id][3]
             execution_time = options_buy[stock_id][trans_id][4]
             
+            #Transfering premium
+            query = '''SELECT * from Customer where id=%s;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query,[buyer])
+                user = dictfetchall(cursor)
+            new_value1 = user[0]['balance'] - premium*num_shares
+            # new_value2 = user.current_value + price_per_share*num_shares
+            new_value2 = user[0]['invested_amount'] + premium*num_shares
+            query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query2,[new_value1,new_value2,buyer])
+                connection.commit()
+            #seller
+            query = '''SELECT * from Customer where id=%s;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query,[seller])
+                user = dictfetchall(cursor)
+            new_value1 = user[0]['balance'] + premium*num_shares
+            # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
+            query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
+            
+            with connection.cursor() as cursor:
+                cursor.execute(query2,[new_value1,seller])
+                connection.commit()
+            
             # request_copy = copy.copy(request)
             derivatives(request,buyer,seller,stock_id, num_shares,price_per_share, premium, execution_time, 'options')    
             options_buy[stock_id].pop(trans_id) 
@@ -552,15 +577,8 @@ def execute_options(request):
             options_to_execute.pop(sno - 1)
             
             print('txn = %s', txn)
-            # txn = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']
-            
-            stock_id = txn[3]
-            quantity = txn[5]
-            buy_or_sell = True
-            price = txn[6]
-            order = 'limit'  
-                    
-            trade_stock(user_name, stock_id, quantity , buy_or_sell,price ,order)
+            # txn = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']    
+            trade_contract(txn[1],txn[2],txn[3],txn[4],txn[5],txn[6])
                     
             return redirect('success')  
     else:

@@ -547,10 +547,79 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
         
     # print(buy_orders)
     # print(sell_orders)
-    print(market_buy['ASIANPAINT'])
-    print(market_sell['ASIANPAINT'])
-    print(buy_orders['ASIANPAINT'])
-    print(sell_orders['ASIANPAINT'])
+    # print(market_buy['ASIANPAINT'])
+    # print(market_sell['ASIANPAINT'])
+    # print(buy_orders['ASIANPAINT'])
+    # print(sell_orders['ASIANPAINT'])
+    
+def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
+    query = '''SELECT max(id) FROM Transaction;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        op = dictfetchall(cursor)
+    buy_id = 1
+    if(op[0]['max']!=None) :
+        buy_id = int(op[0]['max']) + 1
+        
+    query = '''SELECT * from Customer where id=%s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query,[buyer_id])
+        user = dictfetchall(cursor)
+    new_value1 = user[0]['balance'] - price_per_share*num_shares
+    # new_value2 = user.current_value + price_per_share*num_shares
+    new_value2 = user[0]['invested_amount'] + price_per_share*num_shares
+    query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query2,[new_value1,new_value2,buyer_id])
+        connection.commit()
+    #seller
+    query = '''SELECT * from Customer where id=%s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query,[seller_id])
+        user = dictfetchall(cursor)
+    new_value1 = user[0]['balance'] + price_per_share*num_shares
+    # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
+    query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
+    
+    with connection.cursor() as cursor:
+        cursor.execute(query2,[new_value1,seller_id])
+        connection.commit()
+
+    # INSERTING TRANSACTION
+    
+    sql = '''INSERT INTO Transaction (id , buyer_id , seller_id ,stock_id , date , num_shares , price_per_share ) VALUES (%s, %s, %s , %s, %s, %s , %s);'''
+    val = [str(buy_id),buyer_id,seller_id , stock_id, date , num_shares , price_per_share]
+    print(val)
+    with connection.cursor() as cursor:
+        cursor.execute(sql,val)
+        connection.commit()
+        
+    # portfolio updation 
+    #buyer
+    query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query,[buyer_id,stock_id])
+        user_port = dictfetchall(cursor)
+    new_value1 = user_port[0]['invested_amount'] + price_per_share*num_shares
+    new_value2 = user_port[0]['num_shares'] + num_shares
+    query1 = '''UPDATE Portfolio SET num_shares = %s, invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query1,[new_value1, new_value2, buyer_id , stock_id])
+        connection.commit()
+    #seller
+    query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query,[seller_id,stock_id])
+        user_port = dictfetchall(cursor)
+    # new_value1 = user_port[0]['invested_amount'] + price_per_share*num_shares
+    new_value2 = user_port[0]['num_shares'] + num_shares
+    query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query1,[new_value2, seller_id , stock_id])
+        connection.commit()    
+
+
+
 
 def transact():
     while(True):
@@ -724,7 +793,7 @@ def transa(stock_id):
                 with connection.cursor() as cursor:
                     cursor.execute(query2,[new_value1,new_value2,buyt[1].customer])
                     connection.commit()
-                print(2)
+                # print(2)
                 #seller
                 query = '''SELECT * from Customer where id=%s;'''
                 with connection.cursor() as cursor:
@@ -738,7 +807,7 @@ def transa(stock_id):
                 with connection.cursor() as cursor:
                     cursor.execute(query2,[new_value1,sellt[1].customer])
                     connection.commit()
-                print(2)
+                # print(2)
                 # INSERTING TRANSACTION
                 
                 sql = '''INSERT INTO Transaction (id , buyer_id , seller_id ,stock_id , date , num_shares , price_per_share ) VALUES (%s, %s, %s , %s, %s, %s , %s);'''
@@ -747,7 +816,7 @@ def transa(stock_id):
                 with connection.cursor() as cursor:
                     cursor.execute(sql,val)
                     connection.commit()
-                print(3)
+                # print(3)
                 # portfolio updation 
                 #buyer
                 query = '''SELECT * from Portfolio where customer_id=%s and stock_id=%s;'''
