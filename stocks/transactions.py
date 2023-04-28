@@ -391,6 +391,60 @@ options_buy = {
     'ZEEL': []
 }
 
+
+futures_buy = {
+    'ADANIPORTS': [],
+    'ASIANPAINT': [],
+    'AXISBANK': [],
+    'BAJAJAUTO': [],
+    'BAJAJFINSV': [],
+    'BAJFINANCE': [],
+    'BHARTIARTL': [],
+    'BPCL': [],
+    'BRITANNIA': [],
+    'CIPLA': [],
+    'COALINDIA': [],
+    'DRREDDY': [],
+    'EICHERMOT': [],
+    'GAIL': [],
+    'GRASIM': [],
+    'HCLTECH': [],
+    'HDFC': [],
+    'HDFCBANK': [],
+    'HEROMOTOCO': [],
+    'HINDALCO': [],
+    'HINDUNILVR': [],
+    'ICICIBANK': [],
+    'INDUSINDBK': [],
+    'INFRATEL': [],
+    'INFY': [],
+    'IOC': [],
+    'ITC': [],
+    'JSWSTEEL': [],
+    'KOTAKBANK': [],
+    'LT': [],
+    'M&M': [],
+    'MARUTI': [],
+    'NESTLEIND': [],
+    'NTPC': [],
+    'ONGC': [],
+    'POWERGRID': [],
+    'RELIANCE': [],
+    'SBIN': [],
+    'SHREECEM': [],
+    'SUNPHARMA': [],
+    'TATAMOTORS': [],
+    'TATASTEEL': [],
+    'TCS': [],
+    'TECHM': [],
+    'TITAN': [],
+    'ULTRACEMCO': [],
+    'UPL': [],
+    'VEDL': [],
+    'WIPRO': [],
+    'ZEEL': []
+}
+
 #adding and subracting in portdolio
 
 # @transaction.atomic()

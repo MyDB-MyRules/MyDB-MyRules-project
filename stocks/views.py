@@ -14,7 +14,7 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
 from .forms import *
-from .transactions import trade_stock, buy_orders, sell_orders, transact, options_buy
+from .transactions import *
 from .derivatives import derivatives
 from django.contrib import messages
 from .thread import options_to_execute
@@ -509,7 +509,8 @@ def options(request):
             execution_time = options_buy[stock_id][trans_id][4]
             
             # request_copy = copy.copy(request)
-            derivatives(request,buyer,seller,stock_id, num_shares,price_per_share, premium, execution_time)     
+            derivatives(request,buyer,seller,stock_id, num_shares,price_per_share, premium, execution_time, 'options')    
+            options_buy[stock_id].pop(trans_id) 
             # messages.warning(request, 'Transaction Successful')
             return redirect('success')
     else:
@@ -567,9 +568,54 @@ def execute_options(request):
             
     return render(request, 'execute_options.html', {'options': options_to_execute, 'form': form})
 
+
+def futures(request):
+    
+    if request.method == 'POST':
+        form = FuturesForm(request.POST)
+        if form.is_valid():
+            stock_id = form.cleaned_data['stock_id']
+            trans_id = int(form.cleaned_data['trans_id'])
+            
+            buyer = futures_buy[stock_id][trans_id][0]
+            seller = request.user.username
+            num_shares = futures_buy[stock_id][trans_id][1]
+            price_per_share = futures_buy[stock_id][trans_id][2]
+            premium = futures_buy[stock_id][trans_id][3]
+            execution_time = futures_buy[stock_id][trans_id][4]
+            
+            # request_copy = copy.copy(request)
+            derivatives(request,buyer,seller,stock_id, num_shares,price_per_share, premium, execution_time, 'futures')     
+            futures_buy[stock_id].pop(trans_id) 
+            # messages.warning(request, 'Transaction Successful')
+            return redirect('success')
+    else:
+        form = FuturesForm()
+    
+    futures_avail = {}
+    for (symbol, orders) in futures_buy.items():
+        if(len(orders) != 0):
+            futures_avail[symbol] = orders
+            
+    return render(request, 'futures.html', {'futures': futures_avail, 'form': form})
+
+def buy_futures(request):
+    if request.method == 'POST':
+        form = BuyFuturesForm(request.POST)
+        if form.is_valid():
+            stock_id = form.cleaned_data['stock_id']
+            num_shares = float(form.cleaned_data['num_shares'])
+            price_per_share = float(form.cleaned_data['price_per_share'])
+            execution_time = float(form.cleaned_data['execution_time'])
+            user= request.user.username
+            futures_buy[stock_id].append((user, num_shares, price_per_share, 0, execution_time))
+            return redirect('success')
+    else:
+        form = BuyFuturesForm()
+    return render(request, 'buy_futures.html', {'form':form})
+
 def success(request):
     return render(request, 'success.html')
-
 
 def stock_history(request):
     if request.method == 'POST':

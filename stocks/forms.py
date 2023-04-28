@@ -49,11 +49,9 @@ class StockAvg(forms.Form):
 class StockTop10(forms.Form):
     doi = forms.DateField()
     
-
 class OptionsForm(forms.Form):
     stock_id = forms.CharField()
     trans_id = forms.CharField()
-
 class BuyOptionsForm(forms.Form):
     stock_id = forms.CharField()
     num_shares = forms.DecimalField()
@@ -61,10 +59,18 @@ class BuyOptionsForm(forms.Form):
     premium = forms.DecimalField()
     execution_time = forms.DecimalField()
     
-
 class ExecuteOptionsForm(forms.Form):
     sno = forms.CharField()
-    
+
+class FuturesForm(forms.Form):
+    stock_id = forms.CharField()
+    trans_id = forms.CharField()
+class BuyFuturesForm(forms.Form):
+    stock_id = forms.CharField()
+    num_shares = forms.DecimalField()
+    price_per_share = forms.DecimalField()
+    execution_time = forms.DecimalField()
+        
 class HistoryForm(forms.Form):
     stock_id = forms.CharField()
     u = forms.DateField()
