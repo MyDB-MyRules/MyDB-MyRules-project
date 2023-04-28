@@ -570,3 +570,90 @@ def execute_options(request):
 def success(request):
     return render(request, 'success.html')
 
+
+def stock_history(request):
+    if request.method == 'POST':
+        form = HistoryForm(request.POST)
+        if form.is_valid():
+            stock_id = form.cleaned_data['stock_id']
+            query1 = '''SELECT * from Stock_history where symbol=%s LIMIT 100;'''        
+            with connection.cursor() as cursor:
+                cursor.execute(query1,[stock_id])
+                stock_history = dictfetchall(cursor)
+
+            dates = [entry['date'].strftime('%Y-%m-%d') for entry in stock_history]
+            opens = [entry['open'] for entry in stock_history]
+            highs = [entry['high'] for entry in stock_history]
+            lows = [entry['low'] for entry in stock_history]
+            closes = [entry['close'] for entry in stock_history]
+            volumes = [entry['volume'] for entry in stock_history]
+            turnovers = [entry['turnover'] for entry in stock_history]
+            context = {
+                'stock_id': stock_id,
+                'dates': dates,
+                'opens': opens,
+                'highs': highs,
+                'lows': lows,
+                'closes': closes,
+                'volumes': volumes,
+                'turnovers': turnovers,
+            }
+            return render(request, 'history.html', context)
+    else:
+        form = HistoryForm()
+            
+    return render(request, 'history_form.html', {'form': form})
+
+def compare_stocks(request):
+    if request.method == 'POST':
+        form = StockCompForm(request.POST)
+        if form.is_valid():
+            stock_id1 = form.cleaned_data['stock_id1']
+            stock_id2 = form.cleaned_data['stock_id2']
+            query1 = '''SELECT * from Stock_history where symbol=%s LIMIT 100;'''        
+            with connection.cursor() as cursor:
+                cursor.execute(query1,[stock_id1])
+                stock_history1 = dictfetchall(cursor)
+            with connection.cursor() as cursor:
+                cursor.execute(query1,[stock_id2])
+                stock_history2 = dictfetchall(cursor)
+            dates = [entry['date'].strftime('%Y-%m-%d') for entry in stock_history1]
+            opens = [entry['open'] for entry in stock_history1]
+            highs = [entry['high'] for entry in stock_history1]
+            lows = [entry['low'] for entry in stock_history1]
+            closes = [entry['close'] for entry in stock_history1]
+            volumes = [entry['volume'] for entry in stock_history1]
+            turnovers = [entry['turnover'] for entry in stock_history1]
+            
+            dates2 = [entry['date'].strftime('%Y-%m-%d') for entry in stock_history2]
+            opens2 = [entry['open'] for entry in stock_history2]
+            highs2 = [entry['high'] for entry in stock_history2]
+            lows2 = [entry['low'] for entry in stock_history2]
+            closes2 = [entry['close'] for entry in stock_history2]
+            volumes2 = [entry['volume'] for entry in stock_history2]
+            turnovers2 = [entry['turnover'] for entry in stock_history2]
+            context = {
+                'stock_id1': stock_id1,
+                'dates': dates,
+                'opens': opens,
+                'highs': highs,
+                'lows': lows,
+                'closes': closes,
+                'volumes': volumes,
+                'turnovers': turnovers,
+                'stock_id2': stock_id2,
+                'dates2': dates2,
+                'opens2': opens2,
+                'highs2': highs2,
+                'lows2': lows2,
+                'closes2': closes2,
+                'volumes2': volumes2,
+                'turnovers2': turnovers2,
+            }
+            # print(context)
+            return render(request, 'compare.html', context)
+        
+    else:
+        form = StockCompForm()
+            
+    return render(request, 'compare_form.html', {'form': form})

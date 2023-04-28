@@ -65,3 +65,7 @@ class BuyOptionsForm(forms.Form):
 class ExecuteOptionsForm(forms.Form):
     sno = forms.CharField()
     
+class HistoryForm(forms.Form):
+    stock_id = forms.CharField()
+    u = forms.DateField()
+    l = forms.DateField()

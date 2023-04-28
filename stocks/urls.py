@@ -28,4 +28,6 @@ urlpatterns = [
     path('q1', views.q1, name='q1'),
     path('q2', views.q2, name='q2'),
     path('q4', views.q4, name='q4'),
+    path('stock_history', views.stock_history, name='stock_history'),
+    path('stock_compare', views.compare_stocks, name='stock_compare'),
 ]
