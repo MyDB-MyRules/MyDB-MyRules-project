@@ -2,7 +2,7 @@ import threading
 from time import sleep
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from .transactions import trade_stock
+from .transactions import trade_contract
 
 options_to_execute = []
 
@@ -52,16 +52,16 @@ class FuturesThread(threading.Thread):
             print('abt to sleep')
             sleep(float(self.execution_time)*60)
             print("woke up, now execute the transaction")
-            
+            txn = self.transaction
             # txn = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']
-            user_name = self.request.user.username
-            stock_id = self.transaction[3]
-            quantity = self.transaction[5]
-            buy_or_sell = True
-            price = self.transaction[6]
-            order = 'limit'  
+            # user_name = self.request.user.username
+            # stock_id = self.transaction[3]
+            # quantity = self.transaction[5]
+            # buy_or_sell = True
+            # price = self.transaction[6]
+            # order = 'limit'  
                     
-            trade_stock(user_name, stock_id, quantity , buy_or_sell,price, order)                        
+            trade_contract(txn[1],txn[2],txn[3],txn[4],txn[5],txn[6])                     
             
         except Exception as e:
             print(e)            
