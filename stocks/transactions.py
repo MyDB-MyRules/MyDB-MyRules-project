@@ -481,7 +481,7 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
     
     today = date.today()
     
-    # total_cost = quantity * stock[0]['price_per_share']
+    total_cost = quantity * price
     
     # # No. of shares are initialised to 0 when a profile is created for a customer
     # # Check if the user has enough quantity of the stock to sell
