@@ -13,6 +13,7 @@ class BuySellForm(forms.Form):
     MY_CHOICES = [
         ('market', 'Market Order'),
         ('limit', 'Limit Order'),
+        ('stop' , 'Stop Order')
     ]
     order = forms.ChoiceField(choices=MY_CHOICES)
     
