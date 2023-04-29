@@ -204,11 +204,19 @@
 
       <section id="orders">
         <h2>Check stock history trend of a stock</h2>
-        <form action = "stocks2" method = "post">
+        <form action = "stock_history" method = "post">
 			{% csrf_token %}
           <div class="input-group">
             <label for="stock_id">Symbol</label>
             <input type="text" id="symbol" name="stock_id" required>
+          </div>
+          <div class="input-group">
+            <label for="u">Max timestamp</label>
+            <input type="text" id="symbol" name="u" required>
+          </div>
+          <div class="input-group">
+            <label for="l">Min timestamp</label>
+            <input type="text" id="symbol" name="l" required>
           </div>
           <button type="submit">Submit</button>
         </form>
@@ -222,7 +230,7 @@
       <br>
       <section id="orders">
         <h2>Compare 2 stocks</h2>
-        <form action = "stocks4" method = "post">
+        <form action = "stock_compare" method = "post">
 			{% csrf_token %}
           <div class="input-group">
             <label for="stock_id1">Symbol of stock 1</label>

@@ -30,7 +30,7 @@ def dictfetchall(cursor):
 
 def stocks_names(request):
     with connection.cursor() as cursor:
-        cursor.execute('''select symbol from Stock_Metadata;''')
+        cursor.execute('''select symbol, price_per_share from Stock_Metadata;''')
         stocks = dictfetchall(cursor)
 
     return render(request, 'stock_names.html', {'stocks': stocks})
@@ -391,7 +391,7 @@ def q1(request):
     return render(request, 'q1.html', {'form5':form5, 'form6':form6, 'form7':form7, 'form8':form8, 'form9':form9})
 
 def q2(request):
-    form2 = StockForm()
+    form2 = HistoryForm()
     form4 = StockCompForm()
 
     return render(request, 'q2.html', {'form2':form2, 'form4':form4})
@@ -640,11 +640,13 @@ def stock_history(request):
         form = HistoryForm(request.POST)
         if form.is_valid():
             stock_id = form.cleaned_data['stock_id']
-            query1 = '''SELECT * from Stock_history where symbol=%s LIMIT 100;'''        
+            u = form.cleaned_data['u']
+            l = form.cleaned_data['l']
+            query1 = '''SELECT * from Stock_history where symbol=%s and date > %s and date < %s;'''        
             with connection.cursor() as cursor:
-                cursor.execute(query1,[stock_id])
+                cursor.execute(query1,[stock_id, l, u])
                 stock_history = dictfetchall(cursor)
-
+            print(stock_history)
             dates = [entry['date'].strftime('%Y-%m-%d') for entry in stock_history]
             opens = [entry['open'] for entry in stock_history]
             highs = [entry['high'] for entry in stock_history]

@@ -13,7 +13,7 @@ class BuySellForm(forms.Form):
     MY_CHOICES = [
         ('market', 'Market Order'),
         ('limit', 'Limit Order'),
-        ('stop' , 'Stop Order')
+        ('stop', 'Stop Order'),
     ]
     order = forms.ChoiceField(choices=MY_CHOICES)
     
@@ -53,6 +53,7 @@ class StockTop10(forms.Form):
 class OptionsForm(forms.Form):
     stock_id = forms.CharField()
     trans_id = forms.CharField()
+
 class BuyOptionsForm(forms.Form):
     stock_id = forms.CharField()
     num_shares = forms.DecimalField()
@@ -66,6 +67,7 @@ class ExecuteOptionsForm(forms.Form):
 class FuturesForm(forms.Form):
     stock_id = forms.CharField()
     trans_id = forms.CharField()
+
 class BuyFuturesForm(forms.Form):
     stock_id = forms.CharField()
     num_shares = forms.DecimalField()

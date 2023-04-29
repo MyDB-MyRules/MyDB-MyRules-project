@@ -1,4 +1,12 @@
-<p><b>All Stocks</b></p>
-{% for stock in stocks %}
-<li>{{stock.symbol}}</li>
-{% endfor %}
+<p><b>All stocks</b></p>
+<table>
+    <tr>
+        <th>Symbol</th>
+        <th>Price per share</th>
+        {% for element in stocks %}
+    <tr>
+        <td>{{ element.symbol }}</td>
+        <td>{{ element.price_per_share }}</td>
+    </tr>
+    {% endfor %}
+</table>
