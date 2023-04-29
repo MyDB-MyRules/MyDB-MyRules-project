@@ -485,11 +485,11 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
     
     # # No. of shares are initialised to 0 when a profile is created for a customer
     # # Check if the user has enough quantity of the stock to sell
-    # if user_port[0]['num_shares'] < quantity and buy_or_sell==False:
-    #     raise ValueError("Not enough quantity of this stock to sell")
+    if user_port[0]['num_shares'] < quantity and buy_or_sell==False:
+        raise ValueError("Not enough quantity of this stock to sell")
     
-    # if user[0]['balance'] < total_cost and buy_or_sell==True:
-    #     raise ValueError("Not enough balance to buy this stock")
+    if user[0]['balance'] < total_cost and buy_or_sell==True:
+        raise ValueError("Not enough balance to buy this stock")
 
     # Calculate the total revenue of the transaction
     # total_revenue = quantity * stock.price_per_share
