@@ -1207,7 +1207,7 @@ def transa(stock_id):
             stock = dictfetchall(cursor)
             
         if len(stop_buy[stock_id])!=0 :
-            buyt = heapq.heappop(buy_orders[stock_id])
+            buyt = heapq.heappop(stop_buy[stock_id])
         
             if buyt[1].price_per_share >= stock[0]['price_per_share'] :
                 #UPDATING CUSTOMER
@@ -1288,7 +1288,7 @@ def transa(stock_id):
                         connection.commit()
 
         if len(stop_sell[stock_id]) != 0 :
-            sellt= heapq.heappop(sell_orders[stock_id])
+            sellt= heapq.heappop(stop_sell[stock_id])
             if sellt[1].price_per_share <= stock[0]['price_per_share'] :
                 query = '''SELECT * from Customer where id=%s;'''
                 with connection.cursor() as cursor:
