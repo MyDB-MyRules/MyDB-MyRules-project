@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 class BuySellForm(forms.Form):
     stock_id = forms.CharField()
     quantity = forms.DecimalField()
-    buy_or_sell = forms.BooleanField(required=False)
+    buy_or_sell = forms.ChoiceField(choices=[('buy','Buy'),('sell','Sell')])
     price = forms.DecimalField(required=False)
     MY_CHOICES = [
         ('market', 'Market Order'),
