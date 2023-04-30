@@ -1,0 +1,55 @@
+create
+or replace function log() returns trigger language plpgsql as 
+$$ begin
+insert into portfolio values(new.id, ADANIPORTS, 0, 0, 0);
+insert into portfolio values(new.id, ASIANPAINT, 0, 0, 0);
+insert into portfolio values(new.id, AXISBANK, 0, 0, 0);
+insert into portfolio values(new.id, BAJAJAUTO, 0, 0, 0);
+insert into portfolio values(new.id, BAJAJFINSV, 0, 0, 0);
+insert into portfolio values(new.id, BAJFINANCE, 0, 0, 0);
+insert into portfolio values(new.id, BHARTIARTL, 0, 0, 0);
+insert into portfolio values(new.id, BPCL, 0, 0, 0);
+insert into portfolio values(new.id, BRITANNIA, 0, 0, 0);
+insert into portfolio values(new.id, CIPLA, 0, 0, 0);
+insert into portfolio values(new.id, COALINDIA, 0, 0, 0);
+insert into portfolio values(new.id, DRREDDY, 0, 0, 0);
+insert into portfolio values(new.id, EICHERMOT, 0, 0, 0);
+insert into portfolio values(new.id, GAIL, 0, 0, 0);
+insert into portfolio values(new.id, GRASIM, 0, 0, 0);
+insert into portfolio values(new.id, HCLTECH, 0, 0, 0);
+insert into portfolio values(new.id, HDFC, 0, 0, 0);
+insert into portfolio values(new.id, HDFCBANK, 0, 0, 0);
+insert into portfolio values(new.id, HEROMOTOCO, 0, 0, 0);
+insert into portfolio values(new.id, HINDALCO, 0, 0, 0);
+insert into portfolio values(new.id, HINDUNILVR, 0, 0, 0);
+insert into portfolio values(new.id, ICICIBANK, 0, 0, 0);
+insert into portfolio values(new.id, INDUSINDBK, 0, 0, 0);
+insert into portfolio values(new.id, INFRATEL, 0, 0, 0);
+insert into portfolio values(new.id, INFY, 0, 0, 0);
+insert into portfolio values(new.id, IOC, 0, 0, 0);
+insert into portfolio values(new.id, ITC, 0, 0, 0);
+insert into portfolio values(new.id, JSWSTEEL, 0, 0, 0);
+insert into portfolio values(new.id, KOTAKBANK, 0, 0, 0);
+insert into portfolio values(new.id, LT, 0, 0, 0);
+insert into portfolio values(new.id, M&M, 0, 0, 0);
+insert into portfolio values(new.id, MARUTI, 0, 0, 0);
+insert into portfolio values(new.id, NESTLEIND, 0, 0, 0);
+insert into portfolio values(new.id, NTPC, 0, 0, 0);
+insert into portfolio values(new.id, ONGC, 0, 0, 0);
+insert into portfolio values(new.id, POWERGRID, 0, 0, 0);
+insert into portfolio values(new.id, RELIANCE, 0, 0, 0);
+insert into portfolio values(new.id, SBIN, 0, 0, 0);
+insert into portfolio values(new.id, SHREECEM, 0, 0, 0);
+insert into portfolio values(new.id, SUNPHARMA, 0, 0, 0);
+insert into portfolio values(new.id, TATAMOTORS, 0, 0, 0);
+insert into portfolio values(new.id, TATASTEEL, 0, 0, 0);
+insert into portfolio values(new.id, TCS, 0, 0, 0);
+insert into portfolio values(new.id, TECHM, 0, 0, 0);
+insert into portfolio values(new.id, TITAN, 0, 0, 0);
+insert into portfolio values(new.id, ULTRACEMCO, 0, 0, 0);
+insert into portfolio values(new.id, UPL, 0, 0, 0);
+insert into portfolio values(new.id, VEDL, 0, 0, 0);
+insert into portfolio values(new.id, WIPRO, 0, 0, 0);
+insert into portfolio values(new.id, ZEEL, 0, 0, 0);
+end 
+$$;
