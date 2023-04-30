@@ -486,10 +486,10 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
     
     # # No. of shares are initialised to 0 when a profile is created for a customer
     # # Check if the user has enough quantity of the stock to sell
-    if user_port[0]['num_shares'] < quantity and buy_or_sell==False:
+    if user_port[0]['num_shares'] < quantity and buy_or_sell=='sell':
         return -1
     
-    if user[0]['balance'] < total_cost and buy_or_sell==True:
+    if user[0]['balance'] < total_cost and buy_or_sell=='buy':
         return -1
 
     # Calculate the total revenue of the transaction
@@ -503,12 +503,12 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
             num_shares=quantity,
             price_per_share =price
         )
-        if buy_or_sell == False:
+        if buy_or_sell == 'sell':
             heapq.heappush(sell_orders[stock_id], (price, trans))
         else:
             heapq.heappush(buy_orders[stock_id], (-price, trans))
     elif order == 'market' :
-        if(buy_or_sell==True):
+        if(buy_or_sell=='buy'):
             trans = transactn(
                 customer=user_id,
                 stock=stock_id,
@@ -527,7 +527,7 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
             )
             market_sell[stock_id].append(trans)       
     else :
-        if(buy_or_sell==True):
+        if(buy_or_sell=='buy'):
             trans = transactn(
                 customer=user_id,
                 stock=stock_id,
