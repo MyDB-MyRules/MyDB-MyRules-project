@@ -1,5 +1,4 @@
 from datetime import date
-import decimal
 from django.db import connection
 import heapq
 from collections import deque
@@ -450,6 +449,7 @@ futures_buy = {
 
 # @transaction.atomic()
 def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
+    print(buy_or_sell)
     # Get the user and stock objects
     query = '''select id from customer where name = %s;'''
     with connection.cursor() as cursor:
@@ -486,11 +486,11 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
     
     # # No. of shares are initialised to 0 when a profile is created for a customer
     # # Check if the user has enough quantity of the stock to sell
-    if user_port[0]['num_shares'] < quantity and buy_or_sell==False:
-        return -1
+    if user_port[0]['num_shares'] < quantity and buy_or_sell=='sell':
+        raise ValueError("Not enough quantity of this stock to sell")
     
-    if user[0]['balance'] < total_cost and buy_or_sell==True:
-        return -1
+    if user[0]['balance'] < total_cost and buy_or_sell=='buy':
+        raise ValueError("Not enough balance to buy this stock")
 
     # Calculate the total revenue of the transaction
     # total_revenue = quantity * stock.price_per_share
@@ -503,12 +503,12 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
             num_shares=quantity,
             price_per_share =price
         )
-        if buy_or_sell == False:
+        if buy_or_sell == 'sell':
             heapq.heappush(sell_orders[stock_id], (price, trans))
         else:
             heapq.heappush(buy_orders[stock_id], (-price, trans))
     elif order == 'market' :
-        if(buy_or_sell==True):
+        if(buy_or_sell=='buy'):
             trans = transactn(
                 customer=user_id,
                 stock=stock_id,
@@ -527,7 +527,7 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
             )
             market_sell[stock_id].append(trans)       
     else :
-        if(buy_or_sell==True):
+        if(buy_or_sell=='buy'):
             trans = transactn(
                 customer=user_id,
                 stock=stock_id,
@@ -545,11 +545,11 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
                 price_per_share = price
             )
             heapq.heappush(stop_sell[stock_id], (price, trans)) 
-    return 0
+        
     # print(buy_orders)
     # print(sell_orders)
-    # print(market_buy['ASIANPAINT'])
-    # print(market_sell['ASIANPAINT'])
+    print(market_buy['ASIANPAINT'])
+    print(market_sell['ASIANPAINT'])
     # print(buy_orders['ASIANPAINT'])
     # print(sell_orders['ASIANPAINT'])
     
@@ -631,16 +631,9 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
         cursor.execute(query,[stock_id])
         stock = dictfetchall(cursor)
     
-    old_price = stock[0]['price_per_share']
-    print('old_price')
-    print(old_price)
-    print('curr_price')
-    print(curr_price)
-    
-    final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-    print(final_price)
-
-    query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+    old_price = stock['price_per_share']
+    final_price = (curr_price +old_price*1000.0)/1000.0
+    query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
     with connection.cursor() as cursor:
         cursor.execute(query1,[final_price, stock_id])
         connection.commit()    
@@ -655,7 +648,7 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
     for s in stock:
         query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
         with connection.cursor() as cursor:
-            cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+            cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
             connection.commit()    
 
     query = '''select id from customer;'''
@@ -675,7 +668,7 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
 
 def transact():
     while(True):
-        time.sleep(5)
+        time.sleep(20)
         for key in buy_orders:
             # print(key)
             while transa(key) != -1 :
@@ -761,7 +754,7 @@ def transa(stock_id):
                     cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt2[1].num_shares
-                new_value2 = user_port[0]['num_shares'] + buyt2[1].num_shares
+                new_value2 = user_port[0]['num_shares'] - buyt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
@@ -774,14 +767,9 @@ def transa(stock_id):
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)
                 
-                old_price = stock[0]['price_per_share']
-                print('old_price')
-                print(old_price)
-                print('curr_price')
-                print(curr_price)
-                final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-                print(final_price)
-                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+                old_price = stock['price_per_share']
+                final_price = (curr_price +old_price*1000.0)/1000.0
+                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[final_price, stock_id])
                     connection.commit()    
@@ -796,7 +784,7 @@ def transa(stock_id):
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+                        cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
                         connection.commit()    
 
                 query = '''select id from customer;'''
@@ -885,14 +873,9 @@ def transa(stock_id):
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)
                 
-                old_price = stock[0]['price_per_share']
-                print('old_price')
-                print(old_price)
-                print('curr_price')
-                print(curr_price)
-                final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-                print(final_price)
-                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+                old_price = stock['price_per_share']
+                final_price = (curr_price +old_price*1000.0)/1000.0
+                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[final_price, stock_id])
                     connection.commit()    
@@ -907,7 +890,7 @@ def transa(stock_id):
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+                        cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
                         connection.commit()    
 
                 query = '''select id from customer;'''
@@ -995,14 +978,9 @@ def transa(stock_id):
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)
                 
-                old_price = stock[0]['price_per_share']
-                print('old_price')
-                print(old_price)
-                print('curr_price')
-                print(curr_price)
-                final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-                print(final_price)
-                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+                old_price = stock['price_per_share']
+                final_price = (curr_price +old_price*1000.0)/1000.0
+                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[final_price, stock_id])
                     connection.commit()    
@@ -1017,7 +995,7 @@ def transa(stock_id):
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+                        cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
                         connection.commit()    
 
                 query = '''select id from customer;'''
@@ -1042,6 +1020,7 @@ def transa(stock_id):
             stock = dictfetchall(cursor)
             
         if len(market_buy[stock_id])!=0 :
+            print(1)
             buyt = market_buy[stock_id].popleft()
             
             #UPDATING CUSTOMER
@@ -1074,6 +1053,8 @@ def transa(stock_id):
             with connection.cursor() as cursor:
                 cursor.execute(query1,[new_value1, new_value2, buyt.customer , buyt.stock])
                 connection.commit()
+                
+            print(2)
 
             curr_price = stock[0]['price_per_share']
             query = '''select price_per_share, symbol from stock_metadata where symbol = %s;'''
@@ -1081,14 +1062,9 @@ def transa(stock_id):
                 cursor.execute(query,[stock_id])
                 stock = dictfetchall(cursor)
             
-            old_price = stock[0]['price_per_share']
-            print('old_price')
-            print(old_price)
-            print('curr_price')
-            print(curr_price)
-            final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-            print(final_price)
-            query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+            old_price = stock['price_per_share']
+            final_price = (curr_price +old_price*1000.0)/1000.0
+            query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[final_price, stock_id])
                 connection.commit()    
@@ -1103,7 +1079,7 @@ def transa(stock_id):
             for s in stock:
                 query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+                    cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
                     connection.commit()    
 
             query = '''select id from customer;'''
@@ -1159,14 +1135,9 @@ def transa(stock_id):
                 cursor.execute(query,[stock_id])
                 stock = dictfetchall(cursor)
             
-            old_price = stock[0]['price_per_share']
-            print('old_price')
-            print(old_price)
-            print('curr_price')
-            print(curr_price)
-            final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-            print(final_price)
-            query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+            old_price = stock['price_per_share']
+            final_price = (curr_price +old_price*1000.0)/1000.0
+            query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[final_price, stock_id])
                 connection.commit()    
@@ -1181,7 +1152,7 @@ def transa(stock_id):
             for s in stock:
                 query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+                    cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
                     connection.commit()    
 
             query = '''select id from customer;'''
@@ -1247,14 +1218,9 @@ def transa(stock_id):
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)
                 
-                old_price = stock[0]['price_per_share']
-                print('old_price')
-                print(old_price)
-                print('curr_price')
-                print(curr_price)
-                final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-                print(final_price)
-                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+                old_price = stock['price_per_share']
+                final_price = (curr_price +old_price*1000.0)/1000.0
+                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[final_price, stock_id])
                     connection.commit()    
@@ -1269,7 +1235,7 @@ def transa(stock_id):
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+                        cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
                         connection.commit()    
 
                 query = '''select id from customer;'''
@@ -1325,14 +1291,9 @@ def transa(stock_id):
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)
                 
-                old_price = stock[0]['price_per_share']
-                print('old_price')
-                print(old_price)
-                print('curr_price')
-                print(curr_price)
-                final_price = (float(curr_price) +float(old_price)*1000.0)/1000.0
-                print(final_price)
-                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE symbol = %s;'''
+                old_price = stock['price_per_share']
+                final_price = (curr_price +old_price*1000.0)/1000.0
+                query1 = '''UPDATE stock_metadata SET price_per_share = %s WHERE stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[final_price, stock_id])
                     connection.commit()    
@@ -1347,7 +1308,7 @@ def transa(stock_id):
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id']])
+                        cursor.execute(query1,[final_price*s['num_shares'], s['customer_id']])
                         connection.commit()    
 
                 query = '''select id from customer;'''
