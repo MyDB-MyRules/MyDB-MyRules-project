@@ -18,6 +18,7 @@ from .transactions import *
 from .derivatives import derivatives
 from django.contrib import messages
 from .thread import options_to_execute
+import random , datetime
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
