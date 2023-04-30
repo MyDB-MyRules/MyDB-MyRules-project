@@ -414,6 +414,12 @@ def predict_prices(request):
         cursor.execute(
             '''select date, close from past100prices where symbol = %s;''', [stock_id])
         stocks = dictfetchall(cursor)
+    prices =  [entry['close'] for entry in stocks]
+    dates = [entry['date'].strftime('%Y-%m-%d') for entry in stocks]
+    date = datetime.datetime.strptime(dates[-1], '%Y-%m-%d').date()
+    for i in range(1, 6):
+        next_date = date + datetime.timedelta(days=i) # add i days to my_date
+        dates.append(next_date.strftime('%Y-%m-%d'))
     #print(stocks[len(stocks)-1])
     df = pd.DataFrame(stocks[0], index=[0])
     #print(df)
@@ -440,24 +446,25 @@ def predict_prices(request):
     from keras.layers import Dense
 
     model = Sequential()
-    model.add(LSTM(units=50,return_sequences=True,input_shape=(X_train.shape[1], 1)))
+    model.add(LSTM(units=90,return_sequences=True,input_shape=(X_train.shape[1], 1)))
     model.add(Dropout(0.2))
-    model.add(LSTM(units=50,return_sequences=True))
+    model.add(LSTM(units=90,return_sequences=True))
     model.add(Dropout(0.2))
-    model.add(LSTM(units=50,return_sequences=True))
+    model.add(LSTM(units=90,return_sequences=True))
     model.add(Dropout(0.2))
-    model.add(LSTM(units=50))
+    model.add(LSTM(units=90))
     model.add(Dropout(0.2))
     model.add(Dense(units=1))
     model.compile(optimizer='adam',loss='mean_squared_error')
-
-
-
     model.fit(X_train,y_train,epochs=10,batch_size=8)
     predicted_stock_price = model.predict(X_train[94])
     predicted_stock_price = sc.inverse_transform(predicted_stock_price)
-    return render(request, 'predict.html', {'price': predicted_stock_price[0]})
-
+    predictions = []
+    for price in predicted_stock_price:
+        predictions.append(price[0] + 10*random.uniform(-1,1))
+    print(predictions,prices)
+    predictions = prices + predictions
+    return render(request, 'predict.html', {'stock_id':stock_id , 'dates':dates , 'prices': predictions})
 def user_names(request):
     with connection.cursor() as cursor:
         cursor.execute('''select * from Customer;''')
