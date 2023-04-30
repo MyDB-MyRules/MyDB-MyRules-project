@@ -618,7 +618,7 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
         cursor.execute(query,[seller_id,stock_id])
         user_port = dictfetchall(cursor)
     # new_value1 = user_port[0]['invested_amount'] + price_per_share*num_shares
-    new_value2 = user_port[0]['num_shares'] + num_shares
+    new_value2 = user_port[0]['num_shares'] - num_shares
     query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
     with connection.cursor() as cursor:
         cursor.execute(query1,[new_value2, seller_id , stock_id])
