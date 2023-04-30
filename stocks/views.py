@@ -316,7 +316,7 @@ def auth_user(username, password):
 
 
 def registerPage(request):
-    form = CreateUserForm()
+    
 
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
@@ -330,7 +330,8 @@ def registerPage(request):
             messages.success(request, 'User registered successfully')  
 
             return redirect('login')
-
+    else:
+        form = CreateUserForm()
     context = {'form': form}
     return render(request, 'register.html', context)
 
@@ -485,9 +486,13 @@ def trade_stock_view(request):
             #     op = dictfetchall(cursor)
             # # print(op)
             # num_id = int(op[0]['max']) + 1
-            trade_stock(user_name, stock_id, quantity , buy_or_sell,price ,order)
+            ret = trade_stock(user_name, stock_id, quantity , buy_or_sell,price ,order)
+            
+            if ret == 0:
             # Return a response to the user indicating that the transaction was successful
-            return redirect('success')
+                return redirect('success')
+            else:
+                return redirect('failure')
     else:
         form = BuySellForm()
     
@@ -634,6 +639,9 @@ def buy_futures(request):
 
 def success(request):
     return render(request, 'success.html')
+
+def failure(request):
+    return render(request, 'failure.html')
 
 def stock_history(request):
     if request.method == 'POST':

@@ -25,6 +25,7 @@ urlpatterns = [
     path('futures',views.futures, name='futures'),
     path('buy_futures',views.buy_futures, name='buy_futures'),    
     path('success', views.success, name='success'),
+    path('failure', views.failure, name='failure'),
     path('execute_options', views.execute_options, name='execute_options'),
     path('user_names', views.user_names, name='user_names'),
     path('q1', views.q1, name='q1'),
