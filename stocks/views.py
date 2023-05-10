@@ -128,10 +128,16 @@ def holdings(request):
         cursor.execute(query, [id])
         portfolio = dictfetchall(cursor)
     
+    lis = []
     for p in portfolio:
-        p['pnl'] = p['current_value'] - p['invested_amount']
+        pq = dict()
+        pq['pnl'] = p['current_value'] - p['invested_amount']
+        pq['symbol']=p['stock_id']
+        pq['num_shares']=p['num_shares']
+        lis.append(pq)
+        print(pq)
     
-    return render(request, 'holdings.html', {'portfolio': portfolio})
+    return render(request, 'holdings.html', {'portfolio': lis})
 
 def funds(request):
 
