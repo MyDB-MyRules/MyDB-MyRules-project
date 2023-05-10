@@ -23,21 +23,6 @@
     <div class="value-container">
         <span class="value">SUCCESS</span>
       </div>
-      <h3><a href="{% url 'dashboard' %}">Go back to dashboard</a></h3>
-
-    <p>                   
-      {% load notifications_tags %} 
-      {% notifications_unread %}      
-    </p>
-                
-    <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-      {% for notification in  user.notifications.unread %}
-        <div>
-          Message from <b>{{ notification.actor }}</b>
-          <button class="dropdown-item" type="button">{{ notification }}</button>			
-        </div>
-        <div class="dropdown-divider"></div>
-      {% endfor %}
-    </div>      
+      <h3><a href="{% url 'dashboard' %}">Go back to dashboard</a></h3>   
   </body>
   </html>

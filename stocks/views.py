@@ -623,11 +623,11 @@ def execute_options(request):
         form = ExecuteOptionsForm(request.POST)
         if form.is_valid():
             user_name = request.user.username
-            sno = int(form.cleaned_data['sno'])
+            stock_id = int(form.cleaned_data['stock_id'])
 
-            print('sno = %s', sno)    
-            txn = options_to_execute[sno - 1]
-            options_to_execute.pop(sno - 1)
+            print('stock_id = %s', stock_id)    
+            txn = options_to_execute[stock_id]
+            options_to_execute.pop(stock_id)
             
             print('txn = %s', txn)
             # txn = [id, buyer_id, seller_id,stock_id,today,num_shares,price_per_share,5,premium,'options']    

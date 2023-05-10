@@ -61,7 +61,7 @@ class BuyOptionsForm(forms.Form):
     execution_time = forms.DecimalField()
     
 class ExecuteOptionsForm(forms.Form):
-    sno = forms.CharField()
+    stock_id = forms.CharField()
 
 class FuturesForm(forms.Form):
     stock_id = forms.CharField()
