@@ -33,4 +33,5 @@ urlpatterns = [
     path('q4', views.q4, name='q4'),
     path('stock_history', views.stock_history, name='stock_history'),
     path('stock_compare', views.compare_stocks, name='stock_compare'),
+    path('news_feed', views.news_feed, name='news_feed'),
 ]
