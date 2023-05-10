@@ -1,3 +1,28 @@
-FAILURE
+<html>
+    <head>
+        <style>
+.value-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f7f7f7;
+}
 
-<p><a href="{% url 'dashboard' %}">Return to dashboard</a></p>
+.value {
+  font-size: 48px;
+  padding: 20px;
+  border: 5px solid #333;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+</style>
+</head>
+  <body>
+    <div class="value-container">
+        <span class="value">FAILURE</span>
+      </div>
+      <h3><a href="{% url 'dashboard' %}">Go back to dashboard</a></h3>
+  </body>
+  </html>

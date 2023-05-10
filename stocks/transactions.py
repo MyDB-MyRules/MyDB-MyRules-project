@@ -647,22 +647,26 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
 
     #updated the portfolio price
 
+    print('h1')
     query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
     with connection.cursor() as cursor:
         cursor.execute(query,[stock_id])
         stock = dictfetchall(cursor)        
 
+    print('h2')
     for s in stock:
         query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
         with connection.cursor() as cursor:
             cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
             connection.commit()    
 
+    print('h3')
     query = '''select id from customer;'''
     with connection.cursor() as cursor:
         cursor.execute(query)
         customers = dictfetchall(cursor)        
 
+    print('h4')
     for customer in customers:
         query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
         with connection.cursor() as cursor:
@@ -670,7 +674,7 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
             val = dictfetchall(cursor)
         query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
         with connection.cursor() as cursor:
-            cursor.execute(query1, [val['sum'],customer['id']])
+            cursor.execute(query1, [val[0]['sum'],customer['id']])
             connection.commit()
 
 def transact():
@@ -788,22 +792,26 @@ def transa(stock_id):
 
                 #updated the portfolio price
 
+                print('h1')
                 query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
                 with connection.cursor() as cursor:
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)        
 
+                print('h2')
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
                     with connection.cursor() as cursor:
                         cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
                         connection.commit()    
 
+                print('h3')
                 query = '''select id from customer;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     customers = dictfetchall(cursor)        
 
+                print('h4')
                 for customer in customers:
                     query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
                     with connection.cursor() as cursor:
@@ -811,7 +819,7 @@ def transa(stock_id):
                         val = dictfetchall(cursor)
                     query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1, [val['sum'],customer['id']])
+                        cursor.execute(query1, [val[0]['sum'],customer['id']])
                         connection.commit()
 
 
@@ -899,22 +907,26 @@ def transa(stock_id):
 
                 #updated the portfolio price
 
+                print('h1')
                 query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
                 with connection.cursor() as cursor:
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)        
 
+                print('h2')
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
                     with connection.cursor() as cursor:
                         cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
                         connection.commit()    
 
+                print('h3')
                 query = '''select id from customer;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     customers = dictfetchall(cursor)        
 
+                print('h4')
                 for customer in customers:
                     query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
                     with connection.cursor() as cursor:
@@ -922,7 +934,7 @@ def transa(stock_id):
                         val = dictfetchall(cursor)
                     query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1, [val['sum'],customer['id']])
+                        cursor.execute(query1, [val[0]['sum'],customer['id']])
                         connection.commit()
 
                 sellt[1].num_shares -= buyt[1].num_shares
@@ -1009,22 +1021,26 @@ def transa(stock_id):
 
                 #updated the portfolio price
 
+                print('h1')
                 query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
                 with connection.cursor() as cursor:
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)        
 
+                print('h2')
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
                     with connection.cursor() as cursor:
                         cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
                         connection.commit()    
 
+                print('h3')
                 query = '''select id from customer;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     customers = dictfetchall(cursor)        
 
+                print('h4')
                 for customer in customers:
                     query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
                     with connection.cursor() as cursor:
@@ -1032,7 +1048,7 @@ def transa(stock_id):
                         val = dictfetchall(cursor)
                     query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1, [val['sum'],customer['id']])
+                        cursor.execute(query1, [val[0]['sum'],customer['id']])
                         connection.commit()
 
     elif len(stop_buy[stock_id])==0 and len(stop_sell[stock_id])==0:
@@ -1095,22 +1111,26 @@ def transa(stock_id):
 
             #updated the portfolio price
 
+            print('h1')
             query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
             with connection.cursor() as cursor:
                 cursor.execute(query,[stock_id])
                 stock = dictfetchall(cursor)        
 
+            print('h2')
             for s in stock:
                 query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
                     connection.commit()    
 
+            print('h3')
             query = '''select id from customer;'''
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 customers = dictfetchall(cursor)        
 
+            print('h4')
             for customer in customers:
                 query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
                 with connection.cursor() as cursor:
@@ -1118,7 +1138,7 @@ def transa(stock_id):
                     val = dictfetchall(cursor)
                 query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1, [val['sum'],customer['id']])
+                    cursor.execute(query1, [val[0]['sum'],customer['id']])
                     connection.commit()
       
         if len(market_sell[stock_id]) != 0 :
@@ -1173,22 +1193,26 @@ def transa(stock_id):
 
             #updated the portfolio price
 
+            print('h1')
             query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
             with connection.cursor() as cursor:
                 cursor.execute(query,[stock_id])
                 stock = dictfetchall(cursor)        
 
+            print('h2')
             for s in stock:
                 query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
                     connection.commit()    
 
+            print('h3')
             query = '''select id from customer;'''
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 customers = dictfetchall(cursor)        
 
+            print('h4')
             for customer in customers:
                 query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
                 with connection.cursor() as cursor:
@@ -1196,7 +1220,7 @@ def transa(stock_id):
                     val = dictfetchall(cursor)
                 query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query1, [val['sum'],customer['id']])
+                    cursor.execute(query1, [val[0]['sum'],customer['id']])
                     connection.commit()
 
     
@@ -1261,22 +1285,26 @@ def transa(stock_id):
 
                 #updated the portfolio price
 
+                print('h1')
                 query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
                 with connection.cursor() as cursor:
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)        
 
+                print('h2')
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
                     with connection.cursor() as cursor:
                         cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
                         connection.commit()    
 
+                print('h3')
                 query = '''select id from customer;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     customers = dictfetchall(cursor)        
 
+                print('h4')
                 for customer in customers:
                     query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
                     with connection.cursor() as cursor:
@@ -1284,7 +1312,7 @@ def transa(stock_id):
                         val = dictfetchall(cursor)
                     query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1, [val['sum'],customer['id']])
+                        cursor.execute(query1, [val[0]['sum'],customer['id']])
                         connection.commit()
 
         if len(stop_sell[stock_id]) != 0 :
@@ -1339,22 +1367,26 @@ def transa(stock_id):
 
                 #updated the portfolio price
 
+                print('h1')
                 query = '''select customer_id, num_shares from portfolio where stock_id = %s'''
                 with connection.cursor() as cursor:
                     cursor.execute(query,[stock_id])
                     stock = dictfetchall(cursor)        
 
+                print('h2')
                 for s in stock:
                     query1 = '''UPDATE portfolio SET current_value = %s WHERE customer_id = %s and stock_id = %s;'''
                     with connection.cursor() as cursor:
                         cursor.execute(query1,[float(final_price)*float(s['num_shares']), s['customer_id'],stock_id])
                         connection.commit()    
 
+                print('h3')
                 query = '''select id from customer;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     customers = dictfetchall(cursor)        
 
+                print('h4')
                 for customer in customers:
                     query1 = '''select sum(current_value) from portfolio where customer_id = %s'''
                     with connection.cursor() as cursor:
@@ -1362,7 +1394,8 @@ def transa(stock_id):
                         val = dictfetchall(cursor)
                     query1 = '''UPDATE customer SET current_value = %s WHERE id = %s;'''
                     with connection.cursor() as cursor:
-                        cursor.execute(query1, [val['sum'],customer['id']])
+                        cursor.execute(query1, [val[0]['sum'],customer['id']])
                         connection.commit()
+                print('h5')
 
     return 0    

@@ -31,7 +31,7 @@ def dictfetchall(cursor):
 
 def stocks_names(request):
     with connection.cursor() as cursor:
-        cursor.execute('''select symbol, price_per_share from Stock_Metadata;''')
+        cursor.execute('''select * from Stock_Metadata;''')
         stocks = dictfetchall(cursor)
 
     return render(request, 'stock_names.html', {'stocks': stocks})
@@ -111,8 +111,7 @@ def stock_pnl(request):
         cursor.execute(query, [stock_id, doi, stock_id])
         stock = dictfetchall(cursor)
 
-    # return render (request, 'stock_return.html', {'stock': stock, 'stock_id': stock_id})
-    return HttpResponse(stock[0]['pnl'])
+    return render (request, 'pnl.html', {'pnl': stock[0]['pnl']})
 
 def stock_roi(request):
     query = """

@@ -62,16 +62,14 @@ from
 where
     a.date = b.date;
 
-select
-    sum(close) / 30
-from
-    stock_history
-where
-    symbol = :s
-order by
-    date desc
-limit
-    30;
+with a as 
+(
+SELECT * from  stock_history
+WHERE symbol = %s ORDER BY date DESC
+LIMIT 30
+)
+SELECT AVG(close)
+FROM a group by symbol;
 
 select
     *
