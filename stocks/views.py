@@ -1,5 +1,5 @@
 import copy
-import time 
+import time
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpRequest
 from django.db import connection
@@ -727,25 +727,20 @@ def buy_options(request):
                 user_id = val[0]['id']
 
             query = '''SELECT * from Customer where id=%s;'''
-            query2 = '''SELECT * from Portfolio where  customer_id=%s and stock_id=%s;'''
 
 
             with connection.cursor() as cursor:
                 cursor.execute(query,[user_id])
                 user = dictfetchall(cursor)
-                
-            with connection.cursor() as cursor:
-                cursor.execute(query2,[user_id,stock_id])
-                user_port = dictfetchall(cursor)
 
-            # total_cost = num_shares * price_per_share
+            total_cost = num_shares * price_per_share
             
             # # Check if the user has enough quantity of the stock to sell
-            if user_port[0]['num_shares'] < num_shares :
-                return redirect('failure')
+            # if user_port[0]['num_shares'] < num_shares :
+            #     return redirect('failure')
             
-            # if user[0]['balance'] < total_cost and buy_or_sell=='buy':
-            #     return -1
+            if user[0]['balance'] < total_cost :
+                return redirect('failure')
 
             options_buy[stock_id].append((user, num_shares, price_per_share, premium, execution_time))
             return redirect('success')
