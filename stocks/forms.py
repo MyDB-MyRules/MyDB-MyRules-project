@@ -21,8 +21,7 @@ class CreateUserForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
-
-
+        
 class StockForm(forms.Form):
     stock_id = forms.CharField()
 

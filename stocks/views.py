@@ -20,6 +20,45 @@ from django.contrib import messages
 from .thread import options_to_execute
 import random , datetime
 
+from .models import *
+from notifications.signals import notify
+
+def send_message(sender_name, receiver_name, message):
+    sender = User.objects.get(username=sender_name)
+    receiver = User.objects.get(username=receiver_name)
+    notify.send(sender, recipient=receiver, verb=message)
+    print('sent message')
+    
+    print('unsent notifications')
+    for notif in sender.notifications.unsent():
+        print(notif)
+    
+    print('sent notifications')
+    for notif in sender.notifications.sent():
+        print(notif)
+    
+    print('unread notifications')
+    for notif in receiver.notifications.unread():
+        print(notif)
+        
+    print('read notifications')
+    for notif in receiver.notifications.read():
+        print(notif)    
+    return
+
+def message(request):
+    try:
+        if request.method == 'POST':
+            sender = User.objects.get(username=request.user)
+            receiver = User.objects.get(id=request.POST.get('user_id'))
+            notify.send(sender, recipient=receiver, verb='Message', description=request.POST.get('message'))
+            return redirect('index')
+        else:
+            return HttpResponse("Invalid request")
+    except Exception as e:
+        print(e)
+        return HttpResponse("Please login from admin site for sending messages")
+   
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
 
@@ -28,14 +67,12 @@ def dictfetchall(cursor):
     desc = cursor.description
     return [dict(zip([col[0] for col in desc], row)) for row in cursor.fetchall()]
 
-
 def stocks_names(request):
     with connection.cursor() as cursor:
         cursor.execute('''select * from Stock_Metadata;''')
         stocks = dictfetchall(cursor)
 
     return render(request, 'stock_names.html', {'stocks': stocks})
-
 
 def one_stock(request):
     # Ensure that the request is a POST request
@@ -366,8 +403,8 @@ def deregisterPage(request):
     return redirect('register')
 
 def dashboard(request):
-    if(len(options_to_execute) != 0):
-        messages.success(request, 'Your option has been executed. Please accept the transaction by proceeding to the accept_options page.')
+    # if(len(options_to_execute) != 0):
+    #     messages.success(request, 'Your option has been executed. Please accept the transaction by proceeding to the accept_options page.')
     
     query0  = '''select id from customer where name = %s;'''
     with connection.cursor() as cursor:
@@ -520,26 +557,30 @@ def options(request):
             premium = options_buy[stock_id][trans_id][3]
             execution_time = options_buy[stock_id][trans_id][4]
             
+            print('buyer is %s', buyer)
             #Transfering premium
-            query = '''SELECT * from Customer where id=%s;'''
+            query = '''SELECT * from Customer where name=%s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query,[buyer])
                 user = dictfetchall(cursor)
-            new_value1 = user[0]['balance'] - premium*num_shares
+            print("user is %s", user)
+            
+            new_value1 = float(user[0]['balance']) - premium*num_shares
+            print("new value is %s", new_value1)
             # new_value2 = user.current_value + price_per_share*num_shares
-            new_value2 = user[0]['invested_amount'] + premium*num_shares
-            query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
+            new_value2 = float(user[0]['invested_amount']) + premium*num_shares
+            query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE name=%s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query2,[new_value1,new_value2,buyer])
                 connection.commit()
             #seller
-            query = '''SELECT * from Customer where id=%s;'''
+            query = '''SELECT * from Customer where name=%s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query,[seller])
                 user = dictfetchall(cursor)
-            new_value1 = user[0]['balance'] + premium*num_shares
+            new_value1 = float(user[0]['balance']) + premium*num_shares
             # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
-            query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
+            query2 = '''Update Customer SET balance = %s  WHERE name=%s;'''
             
             with connection.cursor() as cursor:
                 cursor.execute(query2,[new_value1,seller])
@@ -593,6 +634,8 @@ def execute_options(request):
             trade_contract(txn[1],txn[2],txn[3],txn[4],txn[5],txn[6])
                     
             return redirect('success')  
+        else:
+            print('form is invalid')
     else:
         form = ExecuteOptionsForm()
             

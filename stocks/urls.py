@@ -1,5 +1,8 @@
-from django.urls import path
+from django.urls import path, include, re_path
 from . import views
+import notifications.urls
+# from django.conf.urls import url
+
 
 urlpatterns = [
     path('', views.loginPage, name='login'),
@@ -33,4 +36,6 @@ urlpatterns = [
     path('q4', views.q4, name='q4'),
     path('stock_history', views.stock_history, name='stock_history'),
     path('stock_compare', views.compare_stocks, name='stock_compare'),
+    # re_path('^inbox/notifications/', include(notifications.urls, namespace='notifications')),    
+    path('inbox/notifications/', include(notifications.urls, namespace='notifications')),
 ]

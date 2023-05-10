@@ -11067,7 +11067,24 @@ section.app_section .img-box img {
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
+              <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  <img src="{% static 'images/wallet.png'%}" alt="" />                   
+                </button>
+
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                  {% for notification in  user.notifications.unread %}
+                    <div>
+                      Message from <b>{{ notification.actor }}</b>
+                      <button class="dropdown-item" type="button">{{ notification }}</button>			
+                    </div>
+                    <div class="dropdown-divider"></div>
+                  {% endfor %}
+                </div>                
+              </div>              
               <ul class="navbar-nav  ">
+
                 <li class="nav-item active">
                   <a class="nav-link" href="#">Dashboard<span class="sr-only">(current)</span></a>
                 </li>
@@ -11087,13 +11104,14 @@ section.app_section .img-box img {
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{% url 'deregister' %}">Deregister</a>
-                </li>
+                </li>               
               </ul>
+
               <div class="user_option">
                 <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
                   <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit"></button>
                 </form>
-              </div>
+              </div> 
             </div>
           </div>
         </nav>
@@ -11348,11 +11366,12 @@ section.app_section .img-box img {
               d="m360 143.707031v8.265625c-12.488281 1.179688-22.4375 10.957032-23.84375 23.421875-1.40625 12.464844 6.117188 24.210938 18.027344 28.144531l22.570312 7.519532c4.9375 1.632812 7.957032 6.613281 7.128906 11.75-.832031 5.136718-5.273437 8.90625-10.476562 8.898437h-10.8125c-5.851562-.007812-10.589844-4.75-10.59375-10.601562v-5.398438h-16v5.398438c.042969 13.644531 10.421875 25.03125 24 26.335937v8.265625h16v-8.265625c12.488281-1.179687 22.4375-10.953125 23.84375-23.421875 1.40625-12.464843-6.117188-24.210937-18.027344-28.144531l-22.570312-7.519531c-4.9375-1.632813-7.957032-6.613281-7.128906-11.75.832031-5.136719 5.273437-8.90625 10.476562-8.898438h10.8125c5.851562.007813 10.589844 4.75 10.59375 10.601563v5.398437h16v-5.398437c-.042969-13.644532-10.421875-25.03125-24-26.335938v-8.265625zm0 0" />
           </svg>
         </div>
+
         <a href="{% url 'transaction' %}">
         <div class="detail-box">
           <h5>
             Place orders
-          </h5>
+          </h5>         
           <p>
             Train to be better, by taking baby steps. Make your investment in profitable stocks here.
             Can place different kinds of orders, start with simple, market orders.
@@ -11603,8 +11622,7 @@ section.app_section .img-box img {
               </li>
             </ul>
           </div>
-        </div>
-        <div class="col-md-3">
+        </div>                  
           <div class="info_form ">
             <h5>
               Newsletter
