@@ -18,7 +18,7 @@ from .transactions import *
 from .derivatives import derivatives
 from django.contrib import messages
 from .thread import options_to_execute
-import random , datetime
+import random , datetime , requests
 
 def stocksview(request):
     return HttpResponse("Hello, Views to be seen here!")
@@ -738,3 +738,23 @@ def compare_stocks(request):
         form = StockCompForm()
             
     return render(request, 'compare_form.html', {'form': form})
+
+def news_feed(request):
+    word = 'Bomb'
+    url = ('https://newsapi.org/v2/everything?'
+        'q=' + word + '&'
+        'from=2023-04-15&'
+        'sortBy=popularity&'
+        'pageSize=8&'
+        'apiKey=416ee23780724723a8edb29119b3589f')
+
+    response = requests.get(url)
+
+    lines=response.json()
+
+    # print(response)
+    # catenewsheadlines = catenewsheadlines['articles']
+    print(lines)
+    lines2 = {'articles':lines['articles'][:4],'articles2':lines['articles'][4:]}
+
+    return render(request , 'news.html',lines2)
