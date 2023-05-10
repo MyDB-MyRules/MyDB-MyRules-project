@@ -554,6 +554,7 @@ def trade_stock(user_name, stock_id, quantity , buy_or_sell,price , order):
     # print(sell_orders['ASIANPAINT'])
     
 def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
+    query1 = '''SELECT * from Stock_Metadata where symbol=%s;''' 
     with connection.cursor() as cursor:
         cursor.execute(query1,[stock_id])
         stock = dictfetchall(cursor)

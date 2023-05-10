@@ -18,7 +18,46 @@ from .transactions import *
 from .derivatives import derivatives
 from django.contrib import messages
 from .thread import options_to_execute
-import random , datetime
+import random , datetime , requests
+
+from .models import *
+from notifications.signals import notify
+
+def send_message(sender_name, receiver_name, message):
+    sender = User.objects.get(username=sender_name)
+    receiver = User.objects.get(username=receiver_name)
+    notify.send(sender, recipient=receiver, verb=message)
+    print('sent message')
+
+    print('unsent notifications')
+    for notif in sender.notifications.unsent():
+        print(notif)
+
+    print('sent notifications')
+    for notif in sender.notifications.sent():
+        print(notif)
+
+    print('unread notifications')
+    for notif in receiver.notifications.unread():
+        print(notif)
+
+    print('read notifications')
+    for notif in receiver.notifications.read():
+        print(notif)    
+    return
+
+def message(request):
+    try:
+        if request.method == 'POST':
+            sender = User.objects.get(username=request.user)
+            receiver = User.objects.get(id=request.POST.get('user_id'))
+            notify.send(sender, recipient=receiver, verb='Message', description=request.POST.get('message'))
+            return redirect('index')
+        else:
+            return HttpResponse("Invalid request")
+    except Exception as e:
+        print(e)
+        return HttpResponse("Please login from admin site for sending messages")
 
 from .models import *
 from notifications.signals import notify
@@ -73,6 +112,104 @@ def stocks_names(request):
         stocks = dictfetchall(cursor)
 
     return render(request, 'stock_names.html', {'stocks': stocks})
+
+def news_feed(request):
+    
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = NewsForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+            
+            words = form.cleaned_data['words']
+            # query = '''SELECT max(id) FROM Transaction;'''
+            # with connection.cursor() as cursor:
+            #     cursor.execute(query)
+            #     op = dictfetchall(cursor)
+            # # print(op)
+            # num_id = int(op[0]['max']) + 1
+
+            url = ('https://newsapi.org/v2/everything?'
+                'q=' + words + '&'
+                'from=2023-04-15&'
+                'sortBy=popularity&'
+                'pageSize=8&'
+                'apiKey=416ee23780724723a8edb29119b3589f')
+
+            response = requests.get(url)
+
+            lines=response.json()
+
+            # print(response)
+            # catenewsheadlines = catenewsheadlines['articles']
+            print(lines)
+            lines2 = {'articles':lines['articles'][:4],'articles2':lines['articles'][4:]}
+
+            return render(request , 'news.html',lines2)   
+
+def profile(request):
+    query0 = '''select * from userdata where username=%s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query0, [request.user.username])
+        user = dictfetchall(cursor)[0]
+    return render(request, 'profile.html', {'user':user})
+
+def holdings(request):
+    query0  = '''select id from customer where name = %s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query0, [request.user.username])
+        id = dictfetchall(cursor)[0]['id']
+
+    query = '''select * from portfolio where customer_id = %s and num_shares > 0;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query, [id])
+        portfolio = dictfetchall(cursor)
+    
+    for p in portfolio:
+        p['pnl'] = p['current_value'] - p['invested_amount']
+    
+    return render(request, 'holdings.html', {'portfolio': portfolio})
+
+def funds(request):
+
+    query0  = '''select id from customer where name = %s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query0, [request.user.username])
+        id = dictfetchall(cursor)[0]['id']
+    query1 = '''select balance from customer where id = %s;'''
+    with connection.cursor() as cursor:
+        cursor.execute(query1, [id])
+        balance = dictfetchall(cursor)[0]['balance']
+    
+    if request.method == "POST":
+        # create a form instance and populate it with data from the request:
+        form = BalanceForm(request.POST)
+        # check whether it's valid:
+        # if form.is_valid():   
+            # Retrieve the user ID, stock ID, and quantity from the request
+        if form.is_valid():  
+            amountadd = form.cleaned_data['Amountadd']
+            amountsub = form.cleaned_data['Amountsub']
+            # query = '''SELECT max(id) FROM Transaction;'''
+            # with connection.cursor() as cursor:
+            #     cursor.execute(query)
+            #     op = dictfetchall(cursor)
+            # # print(op)
+            # num_id = int(op[0]['max']) + 1
+            
+            print(amountadd)
+            print(amountsub)
+            query = '''update customer set balance = %s where id=%s;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query, [float(balance) + float(amountadd) - float(amountsub),id])
+                connection.commit()         
+            return redirect('success')
+            
+    else:
+        form = BalanceForm()
+
+    return render(request, 'funds.html', {'balance': balance})    
 
 def one_stock(request):
     # Ensure that the request is a POST request
@@ -298,7 +435,7 @@ def register_user(username, password, name, email):
     VALUES (%s, %s, %s);
     '''
 
-    init_balance = 50000
+    init_balance = 0
     with connection.cursor() as cursor:
         cursor.execute(query, [customer_id, name, init_balance])
 
@@ -415,8 +552,9 @@ def dashboard(request):
     with connection.cursor() as cursor:
         cursor.execute(query, [id])
         portfolio = dictfetchall(cursor)
-        
-    return render(request, 'dashboard.html', {'portfolio' : portfolio})
+    form = NewsForm()
+
+    return render(request, 'dashboard.html', {'portfolio' : portfolio, 'form' : form})
 # predict prices
 
 def q1(request):
@@ -496,9 +634,10 @@ def predict_prices(request):
     model.fit(X_train,y_train,epochs=10,batch_size=8)
     predicted_stock_price = model.predict(X_train[94])
     predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+    
     predictions = []
     for price in predicted_stock_price:
-        predictions.append(price[0] + 10*random.uniform(-1,1))
+        predictions.append(price[0])
     print(predictions,prices)
     predictions = prices + predictions
     return render(request, 'predict.html', {'stock_id':stock_id , 'dates':dates , 'prices': predictions})
@@ -591,6 +730,7 @@ def options(request):
             options_buy[stock_id].pop(trans_id) 
             # messages.warning(request, 'Transaction Successful')
             return redirect('success')
+    
     else:
         form = OptionsForm()
     

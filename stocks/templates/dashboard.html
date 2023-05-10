@@ -11089,14 +11089,14 @@ section.app_section .img-box img {
                   <a class="nav-link" href="#">Dashboard<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item ">
-                  <a class="nav-link" href="{% url 'stocks_names' %}">Stocks</a>
+                  <a class="nav-link" href="{% url 'profile' %}">Profile</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#positions">Positions</a>
+                  <a class="nav-link" href="{% url 'holdings' %}">Holdings</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#positions">
-                    <span>Wallet</span> <img src="{% static 'images/wallet.png'%}" alt="" />
+                  <a class="nav-link" href="{% url 'funds' %}">
+                    <span>Funds</span> <img src="{% static 'images/wallet.png'%}" alt="" />
                   </a>
                 </li>
                 <li class="nav-item">
@@ -11108,8 +11108,10 @@ section.app_section .img-box img {
               </ul>
 
               <div class="user_option">
-                <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
-                  <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit"></button>
+                <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0"  action="news_feed" method = "post">
+                  {% csrf_token %}
+                  <input type="text" placeholder="Search.." name="words">
+                  <!-- <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit"></button>  -->
                 </form>
               </div> 
             </div>
@@ -11622,7 +11624,12 @@ section.app_section .img-box img {
               </li>
             </ul>
           </div>
+<<<<<<< HEAD
         </div>                  
+=======
+        </div>
+      </div>
+>>>>>>> 8e5b2f0d030f25daed5aa560ff69fc93ff43bfc5
           <div class="info_form ">
             <h5>
               Newsletter
