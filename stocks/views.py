@@ -1,5 +1,5 @@
 import copy
-import time
+import time 
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpRequest
 from django.db import connection
