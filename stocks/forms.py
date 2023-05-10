@@ -20,8 +20,10 @@ class BuySellForm(forms.Form):
 class CreateUserForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['username',  'email', 'password1', 'password2']
 
+class NewsForm(forms.Form):
+    words = forms.CharField()
 
 class StockForm(forms.Form):
     stock_id = forms.CharField()
@@ -78,3 +80,7 @@ class HistoryForm(forms.Form):
     stock_id = forms.CharField()
     u = forms.DateField()
     l = forms.DateField()
+
+class BalanceForm(forms.Form):
+    Amountadd = forms.DecimalField()
+    Amountsub = forms.DecimalField()

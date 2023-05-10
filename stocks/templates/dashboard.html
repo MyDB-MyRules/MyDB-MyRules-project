@@ -11067,19 +11067,35 @@ section.app_section .img-box img {
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <div class="d-flex ml-auto flex-column flex-lg-row align-items-center">
+              <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">
+                  <img src="{% static 'images/wallet.png'%}" alt="" />                   
+                </button>
+
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                  {% for notification in  user.notifications.unread %}
+                    <div>
+                      Message from <b>{{ notification.actor }}</b>
+                      <button class="dropdown-item" type="button">{{ notification }}</button>			
+                    </div>
+                    <div class="dropdown-divider"></div>
+                  {% endfor %}
+                </div>                
+              </div>              
               <ul class="navbar-nav  ">
                 <li class="nav-item active">
                   <a class="nav-link" href="#">Dashboard<span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item ">
-                  <a class="nav-link" href="{% url 'stocks_names' %}">Stocks</a>
+                  <a class="nav-link" href="{% url 'profile' %}">Profile</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#positions">Positions</a>
+                  <a class="nav-link" href="{% url 'holdings' %}">Holdings</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#positions">
-                    <span>Wallet</span> <img src="{% static 'images/wallet.png'%}" alt="" />
+                  <a class="nav-link" href="{% url 'funds' %}">
+                    <span>Funds</span> <img src="{% static 'images/wallet.png'%}" alt="" />
                   </a>
                 </li>
                 <li class="nav-item">
@@ -11090,8 +11106,10 @@ section.app_section .img-box img {
                 </li>
               </ul>
               <div class="user_option">
-                <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
-                  <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit"></button>
+                <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0"  action="news_feed" method = "post">
+                  {% csrf_token %}
+                  <input type="text" placeholder="Search.." name="words">
+                  <!-- <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit"></button>  -->
                 </form>
               </div>
             </div>
@@ -11604,7 +11622,7 @@ section.app_section .img-box img {
             </ul>
           </div>
         </div>
-        <div class="col-md-3">
+      </div>
           <div class="info_form ">
             <h5>
               Newsletter

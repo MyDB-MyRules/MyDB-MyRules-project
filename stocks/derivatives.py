@@ -37,9 +37,9 @@ def derivatives(request, buyer, seller, stock_id, num_shares, price_per_share,pr
     print('done')
     
     if type == 'futures':
-        t=FuturesThread(request, execution_time, params)
+        t=FuturesThread(request, execution_time, params, buyer, seller)
     else:
-        t=OptionsThread(request, execution_time, params)
+        t=OptionsThread(request, execution_time, params, buyer, seller)
         
     t.start()
     # this will create new threads for each derivative done
