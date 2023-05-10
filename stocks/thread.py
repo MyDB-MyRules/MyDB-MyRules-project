@@ -38,8 +38,8 @@ class OptionsThread(threading.Thread):
             print('abt to sleep again')
             sleep(120)
             options_to_execute.remove(self.transaction)
-            print("timed out, removed from list")       
-                                    
+            print("timed out, removed from list")             
+            
         except Exception as e:
             print(e)
             
@@ -68,10 +68,7 @@ class FuturesThread(threading.Thread):
             # price = self.transaction[6]
             # order = 'limit'  
                     
-            trade_contract(txn[1],txn[2],txn[3],txn[4],txn[5],txn[6])    
-            
+            trade_contract(txn[1],txn[2],txn[3],txn[4],txn[5],txn[6])                     
             
         except Exception as e:
             print(e)            
-            
-    

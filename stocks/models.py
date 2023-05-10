@@ -65,6 +65,7 @@ class StockHistory(models.Model):
         db_table = 'stock_history'
         unique_together = (('date', 'symbol'),)
 
+
 class StockMetadata(models.Model):
     company_name = models.CharField()
     industry = models.CharField(blank=True, null=True)
@@ -75,6 +76,7 @@ class StockMetadata(models.Model):
     class Meta:
         managed = False
         db_table = 'stock_metadata'
+
 
 class Transaction(models.Model):
     id = models.CharField(primary_key=True)
