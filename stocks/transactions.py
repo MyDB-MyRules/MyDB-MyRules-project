@@ -568,6 +568,7 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
     new_value1 = float(user[0]['balance']) - price_per_share*num_shares
     # new_value2 = user.current_value + price_per_share*num_shares
     new_value2 = float(user[0]['invested_amount']) + price_per_share*num_shares
+    new_value2 = max(new_value2,0.0)
     query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
     with connection.cursor() as cursor:
         cursor.execute(query2,[new_value1,new_value2,buyer_id])
@@ -612,6 +613,7 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
         cursor.execute(query,[seller_id,stock_id])
         user_port = dictfetchall(cursor)
     new_value1 = float(user_port[0]['invested_amount']) - price_per_share*num_shares
+    new_value1 = max(new_value1,0.0)
     new_value2 = float(user_port[0]['num_shares']) - num_shares
     query1 = '''UPDATE Portfolio SET num_shares = %s , invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
     with connection.cursor() as cursor:
@@ -759,6 +761,7 @@ def transa(stock_id):
                     cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] - sellt[1].price_per_share*buyt2[1].num_shares
+                new_value1 = max(new_value1,0.0)
                 new_value2 = user_port[0]['num_shares'] - buyt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s,invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
@@ -874,6 +877,7 @@ def transa(stock_id):
                     cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] - sellt2[1].price_per_share*sellt2[1].num_shares
+                new_value1 = max(new_value1,0.0)
                 new_value2 = user_port[0]['num_shares'] - sellt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s , invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
@@ -989,6 +993,7 @@ def transa(stock_id):
                     cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 new_value1 = user_port[0]['invested_amount'] - sellt[1].price_per_share*sellt[1].num_shares
+                new_value1 = max(new_value1,0.0)
                 new_value2 = user_port[0]['num_shares'] - sellt[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s , invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
@@ -1163,6 +1168,7 @@ def transa(stock_id):
                 user_port = dictfetchall(cursor)
             new_value2 = user_port[0]['num_shares'] - sellt.num_shares
             new_value1 = user_port[0]['invested_amount'] - stock[0]['price_per_share']*sellt.num_shares
+            new_value1 = max(new_value1,0.0)
             query1 = '''UPDATE Portfolio SET num_shares = %s , invested_amount =%s  WHERE customer_id = %s and stock_id = %s;'''
             with connection.cursor() as cursor:
                 cursor.execute(query1,[ new_value2,new_value1 , sellt.customer , sellt.stock])
@@ -1338,6 +1344,7 @@ def transa(stock_id):
                     user_port = dictfetchall(cursor)
                 new_value2 = user_port[0]['num_shares'] - sellt[1].num_shares
                 new_value1 = user_port[0]['invested_amount'] - stock[0]['price_per_share']*sellt[1].num_shares
+                new_value1 = max(new_value1,0.0)
                 query1 = '''UPDATE Portfolio SET num_shares = %s , invested_amount = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[ new_value2,new_value1 , sellt[1].customer , sellt[1].stock])
