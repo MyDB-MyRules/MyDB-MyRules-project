@@ -766,7 +766,7 @@ def transa(stock_id):
                     cursor.execute(query,[sellt[1].customer,buyt[1].stock])
                     user_port = dictfetchall(cursor)
                 # new_value1 = user_port[0]['invested_amount'] + sellt[1].price_per_share*buyt2[1].num_shares
-                new_value2 = user_port[0]['num_shares'] + buyt2[1].num_shares
+                new_value2 = user_port[0]['num_shares'] - buyt2[1].num_shares
                 query1 = '''UPDATE Portfolio SET num_shares = %s WHERE customer_id = %s and stock_id = %s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query1,[new_value2, sellt[1].customer , buyt[1].stock])
