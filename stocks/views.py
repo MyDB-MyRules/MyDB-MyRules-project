@@ -676,9 +676,10 @@ def options(request):
             new_value1 = float(user[0]['balance']) - premium*num_shares
             print("new value is %s", new_value1)
             # new_value2 = user.current_value + price_per_share*num_shares
-            query2 = '''Update Customer SET balance = %s WHERE name=%s;'''
+            new_value2 = float(user[0]['invested_amount']) + premium*num_shares
+            query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE name=%s;'''
             with connection.cursor() as cursor:
-                cursor.execute(query2,[new_value1,buyer])
+                cursor.execute(query2,[new_value1,new_value2,buyer])
                 connection.commit()
             #seller
             query = '''SELECT * from Customer where name=%s;'''
@@ -719,7 +720,6 @@ def buy_options(request):
             premium = float(form.cleaned_data['premium'])
             execution_time = float(form.cleaned_data['execution_time'])
             user= request.user.username
-            
             options_buy[stock_id].append((user, num_shares, price_per_share, premium, execution_time))
             return redirect('success')
     else:
