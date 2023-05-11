@@ -676,10 +676,9 @@ def options(request):
             new_value1 = float(user[0]['balance']) - premium*num_shares
             print("new value is %s", new_value1)
             # new_value2 = user.current_value + price_per_share*num_shares
-            new_value2 = float(user[0]['invested_amount']) + premium*num_shares
-            query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE name=%s;'''
+            query2 = '''Update Customer SET balance = %s WHERE name=%s;'''
             with connection.cursor() as cursor:
-                cursor.execute(query2,[new_value1,new_value2,buyer])
+                cursor.execute(query2,[new_value1,buyer])
                 connection.commit()
             #seller
             query = '''SELECT * from Customer where name=%s;'''
@@ -720,28 +719,7 @@ def buy_options(request):
             premium = float(form.cleaned_data['premium'])
             execution_time = float(form.cleaned_data['execution_time'])
             user= request.user.username
-            query = '''select id from customer where name = %s;'''
-            with connection.cursor() as cursor:
-                cursor.execute(query, [user])
-                val = dictfetchall(cursor)
-                user_id = val[0]['id']
-
-            query = '''SELECT * from Customer where id=%s;'''
-
-
-            with connection.cursor() as cursor:
-                cursor.execute(query,[user_id])
-                user = dictfetchall(cursor)
-
-            total_cost = num_shares * price_per_share
             
-            # # Check if the user has enough quantity of the stock to sell
-            # if user_port[0]['num_shares'] < num_shares :
-            #     return redirect('failure')
-            
-            if user[0]['balance'] < total_cost :
-                return redirect('failure')
-
             options_buy[stock_id].append((user, num_shares, price_per_share, premium, execution_time))
             return redirect('success')
     else:
