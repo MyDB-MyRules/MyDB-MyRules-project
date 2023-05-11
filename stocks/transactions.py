@@ -579,12 +579,18 @@ def trade_contract(buyer_id,seller_id,stock_id,date,num_shares,price_per_share):
         cursor.execute(query,[seller_id])
         user = dictfetchall(cursor)
     new_value1 = float(user[0]['balance']) + price_per_share*num_shares
-    # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
-    query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
-    
+    new_value2 = float(user[0]['invested_amount']) - price_per_share*num_shares
+    new_value2 = max(new_value2,0.0)
+    query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
     with connection.cursor() as cursor:
-        cursor.execute(query2,[new_value1,seller_id])
+        cursor.execute(query2,[new_value1,new_value2,seller_id])
         connection.commit()
+    # # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
+    # query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
+    
+    # with connection.cursor() as cursor:
+    #     cursor.execute(query2,[new_value1,seller_id])
+    #     connection.commit()
 
     # INSERTING TRANSACTION
     
@@ -719,6 +725,7 @@ def transa(stock_id):
                 new_value1 = user[0]['balance'] - buyt2[1].price_per_share*buyt2[1].num_shares
                 # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
                 new_value2 = user[0]['invested_amount'] + buyt2[1].price_per_share*buyt2[1].num_shares
+                new_value2 = max(0, new_value2)
                 query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
                 with connection.cursor() as cursor:
                     cursor.execute(query2,[new_value1,new_value2,buyt[1].customer])
@@ -730,11 +737,17 @@ def transa(stock_id):
                     user = dictfetchall(cursor)
                 new_value1 = user[0]['balance'] + buyt2[1].price_per_share*buyt2[1].num_shares
                 # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
-                query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
-                with connection.cursor() as cursor:
-                    cursor.execute(query2,[new_value1,sellt[1].customer])
-                    connection.commit()
+                # query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
+                # with connection.cursor() as cursor:
+                #     cursor.execute(query2,[new_value1,sellt[1].customer])
+                #     connection.commit()
                 
+                new_value2 = user[0]['invested_amount'] - buyt2[1].price_per_share*buyt2[1].num_shares
+                new_value2 = max(0.0, new_value2)
+                query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
+                with connection.cursor() as cursor:
+                    cursor.execute(query2,[new_value1,new_value2,sellt[1].customer])
+                    connection.commit()                
                 
                 # INSERTING TRANSACTION
                 sql = '''INSERT INTO Transaction (id , buyer_id , seller_id ,stock_id , date , num_shares , price_per_share ) VALUES (%s, %s, %s , %s, %s, %s , %s);'''
@@ -846,11 +859,17 @@ def transa(stock_id):
                     user = dictfetchall(cursor)
                 new_value1 = user[0]['balance'] + sellt2[1].price_per_share*sellt2[1].num_shares
                 # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
-                query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
+                # query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
+                # with connection.cursor() as cursor:
+                #     cursor.execute(query2,[new_value1,sellt[1].customer])
+                #     connection.commit()
+ 
+                new_value2 = user[0]['invested_amount'] - sellt2[1].price_per_share*sellt2[1].num_shares
+                new_value2 = max(new_value2,0.0)
+                query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query2,[new_value1,sellt[1].customer])
-                    connection.commit()
-                
+                    cursor.execute(query2,[new_value1,new_value2,sellt[1].customer])
+                    connection.commit()                
                 
                 # INSERTING TRANSACTION
                 sql = '''INSERT INTO Transaction (id , buyer_id , seller_id ,stock_id , date , num_shares , price_per_share ) VALUES (%s, %s, %s , %s, %s, %s , %s);'''
@@ -960,10 +979,11 @@ def transa(stock_id):
                 # print(user)
                 new_value1 = user[0]['balance'] + sellt[1].price_per_share*sellt[1].num_shares
                 # new_value2 = user.current_value + buyt2[1].price_per_share*buyt[1].num_shares
-                query2 = '''Update Customer SET balance = %s  WHERE id=%s;'''
-                
+                new_value2 = user[0]['invested_amount'] - sellt[1].price_per_share*sellt[1].num_shares
+                new_value2 = max(new_value2,0.0)
+                query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query2,[new_value1,sellt[1].customer])
+                    cursor.execute(query2,[new_value1,new_value2,sellt[1].customer])
                     connection.commit()
                 # print(2)
                 # INSERTING TRANSACTION
@@ -1148,11 +1168,13 @@ def transa(stock_id):
                 cursor.execute(query,[sellt.customer])
                 user = dictfetchall(cursor)
             new_value1 = user[0]['balance'] + stock[0]['price_per_share']*sellt.num_shares
-            query2 = '''Update Customer SET balance = %s WHERE id=%s;'''
-            with connection.cursor() as cursor:
-                cursor.execute(query2,[new_value1,sellt.customer])
-                connection.commit()
             
+            new_value2 = user[0]['invested_amount'] - stock[0]['price_per_share']*sellt.num_shares
+            new_value2 = max(new_value2,0)
+            query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
+            with connection.cursor() as cursor:
+                cursor.execute(query2,[new_value1,new_value2,sellt[1].customer])
+                connection.commit()
             
             # INSERTING TRANSACTION
             sql = '''INSERT INTO Transaction (id , buyer_id , seller_id ,stock_id , date , num_shares , price_per_share ) VALUES (%s, %s, %s , %s, %s, %s , %s);'''
@@ -1324,9 +1346,11 @@ def transa(stock_id):
                     cursor.execute(query,[sellt[1].customer])
                     user = dictfetchall(cursor)
                 new_value1 = user[0]['balance'] + stock[0]['price_per_share']*sellt[1].num_shares
-                query2 = '''Update Customer SET balance = %s WHERE id=%s;'''
+                new_value2 = user[0]['invested_amount'] - stock[0]['price_per_share']*sellt[1].num_shares
+                new_value2 = max(new_value2,0)
+                query2 = '''Update Customer SET balance = %s , invested_amount = %s WHERE id=%s;'''
                 with connection.cursor() as cursor:
-                    cursor.execute(query2,[new_value1,sellt[1].customer])
+                    cursor.execute(query2,[new_value1,new_value2,sellt[1].customer])
                     connection.commit()
                 
                 
